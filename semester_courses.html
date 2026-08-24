@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Engineering Roadmap</title>
+    <!-- Single source of truth: all course data lives in curriculum.js -->
+    <script src="curriculum.js"></script>
     <style>
         :root {
             --bg-color: #f4f7f6;
@@ -228,205 +230,102 @@
 </head>
 <body>
 
-    <h1>Bachelor of Engineering: Computer Engineering (2024)</h1>
+    <h1 id="page-title"></h1>
     <div id="legend" class="legend-container"></div>
     <div id="roadmap" class="roadmap-container"></div>
 
     <script>
-        const legendData = [
-            { name: "ศึกษาทั่วไป (30)", class: "bg-light-green" },
-            { name: "พื้นฐานคณิต-วิทย์ (21)", class: "bg-blue" },
-            { name: "พื้นฐานวิศวกรรม (11)", class: "bg-pink" },
-            { name: "แกนระดับสาขาวิชา (39)", classes: ["bg-purple", "bg-teal", "bg-red"] },
-            { name: "เทคโนโลยีสารสนเทศ (6)", class: "bg-red" },
-            { name: "ทักษะสำหรับศตวรรษที่ 21 (6)", class: "bg-dark-purple" },
-            { name: "วิชาเลือก (18)", class: "bg-orange" },
-            { name: "วิชาเลือกเสรี (6)", class: "bg-grey" }
-        ];
+        // ─────────────────────────────────────────────────────────────
+        //  All data comes from curriculum.js (window.CURRICULUM)
+        // ─────────────────────────────────────────────────────────────
+        const DATA = window.CURRICULUM;
 
-        const curriculumData = {
-            "years": [
-                {
-                    "year": 1,
-                    "semesters": [
-                        {
-                            "semester": "1/1 (16 Credits)",
-                            "courses": [
-                                { "name": "COMP PROG", "code": "2110101", "credits": 3, "class": "bg-purple", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "EXPL ENG WORLD", "code": "2100111", "credits": 3, "class": "bg-pink", "legend": "พื้นฐานวิศวกรรม (11)" },
-                                { "name": "CALCULUS I", "code": "2301107", "credits": 3, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "GEN PHYS I", "code": "2304103", "credits": 3, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "GEN PHYS LAB I", "code": "2304183", "credits": 1, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "EXP ENG I", "code": "5500111", "credits": 3, "class": "bg-olive", "legend": "ศึกษาทั่วไป (30) - หมวดภาษา" }
-                            ]
-                        },
-                        {
-                            "semester": "1/2 (20 Credits)",
-                            "courses": [
-                                { "name": "PROG METH I", "code": "2110215", "credits": 3, "class": "bg-purple", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "COM ENG ESS", "code": "2110221", "credits": 3, "class": "bg-pink", "legend": "พื้นฐานวิศวกรรม (11)" },
-                                { "name": "CALCULUS II", "code": "2301108", "credits": 3, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "GEN PHYS II", "code": "2304104", "credits": 3, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "GEN PHYS LAB II", "code": "2304184", "credits": 1, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "GEN CHEM", "code": "2302127", "credits": 3, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "GEN CHEM LAB", "code": "2302163", "credits": 1, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "EXP ENG II", "code": "5500112", "credits": 3, "class": "bg-olive", "legend": "ศึกษาทั่วไป (30) - หมวดภาษา" }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "year": 2,
-                    "semesters": [
-                        {
-                            "semester": "2/1 (16 Credits)",
-                            "courses": [
-                                { "name": "DISCRETE STRUCT", "code": "2110200", "credits": 3, "class": "bg-purple", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "INTRO DATA STRUCT", "code": "2110211", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "STAT PHYS SCIENCE", "code": "2603284", "credits": 3, "class": "bg-blue", "legend": "พื้นฐานคณิต-วิทย์ (21)" },
-                                { "name": "DIG LO", "code": "2110251", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "DIG LOGIC LAB I", "code": "2110263", "credits": 1, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "GENERAL ED", "code": "xxx", "credits": 3, "class": "bg-light-green", "legend": "ศึกษาทั่วไป (30)" }
-                            ]
-                        },
-                        {
-                            "semester": "2/2 (19 Credits)",
-                            "courses": [
-                                { "name": "COMP ENG MATH I", "code": "2110201", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "ALGO DESIGN", "code": "2110327", "credits": 3, "class": "bg-purple", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "DB SYS", "code": "2110322", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "OS", "code": "2110313", "credits": 3, "class": "bg-red", "legend": "เทคโนโลยีสารสนเทศ (6)" },
-                                { "name": "Com Sys Arch", "code": "2110352", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "HW SYN LAB I", "code": "2110363", "credits": 1, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "COM PRES SKIL", "code": "5500208", "credits": 3, "class": "bg-olive", "legend": "ศึกษาทั่วไป (30) - หมวดภาษา" }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "year": 3,
-                    "semesters": [
-                        {
-                            "semester": "3/1 (18 Credits)",
-                            "courses": [
-                                { "name": "COM ENG MATH II", "code": "2110203", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "SE LAB", "code": "2110xxx", "credits": 1, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "SOFTWARE ENG", "code": "2110423", "credits": 3, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "Dis Sys", "code": "2110318", "credits": 1, "class": "bg-red", "legend": "เทคโนโลยีสารสนเทศ (6)" },
-                                { "name": "COMP NETWORK", "code": "2110471", "credits": 3, "class": "bg-red", "legend": "เทคโนโลยีสารสนเทศ (6)" },
-                                { "name": "EMBEDDED SYS LAB I", "code": "2110366", "credits": 1, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "ELECTIVE", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "GENERAL ED", "code": "xxx", "credits": 3, "class": "bg-light-green", "legend": "ศึกษาทั่วไป (30)" }
-                            ]
-                        },
-                        {
-                            "semester": "3/2 (15+2 Credits)",
-                            "courses": [
-                                { "name": "APPROVED ELEC.", "code": "2110yyy", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "21st Century", "code": "2100xxx", "credits": 3, "class": "bg-dark-purple", "legend": "ทักษะสำหรับศตวรรษที่ 21 (6)" },
-                                { "name": "FREE ELECTIVE", "code": "xxx", "credits": 3, "class": "bg-grey", "legend": "วิชาเลือกเสรี (6)" },
-                                { "name": "ELECTIVE", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "TECH WRIT ENG", "code": "5500308", "credits": 3, "class": "bg-olive", "legend": "ศึกษาทั่วไป (30) - หมวดภาษา" },
-                                { "name": "ENG PRACTICE", "code": "2100301", "credits": 2, "class": "bg-teal", "legend": "แกนระดับสาขาวิชา (39)" }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "year": 4,
-                    "semesters": [
-                        {
-                            "semester": "4/1 (16 Credits)",
-                            "courses": [
-                                { "name": "CAP PROJ I", "code": "2110488", "credits": 1, "class": "bg-purple", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "APPROVED ELEC.", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "ELECTIVE", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "ELECTIVE", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "GENERAL ED", "code": "xxx", "credits": 6, "class": "bg-light-green", "legend": "ศึกษาทั่วไป (30)" }
-                            ]
-                        },
-                        {
-                            "semester": "4/2 (15 Credits)",
-                            "courses": [
-                                { "name": "CAP PROJ II", "code": "2110489", "credits": 3, "class": "bg-purple", "legend": "แกนระดับสาขาวิชา (39)" },
-                                { "name": "21st Century", "code": "2100xxx", "credits": 3, "class": "bg-dark-purple", "legend": "ทักษะสำหรับศตวรรษที่ 21 (6)" },
-                                { "name": "ELECTIVE", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "ELECTIVE", "code": "2110xxx", "credits": 3, "class": "bg-orange", "legend": "วิชาเลือก (18)" },
-                                { "name": "FREE ELECTIVE", "code": "xxx", "credits": 3, "class": "bg-grey", "legend": "วิชาเลือกเสรี (6)" }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
+        // Page title from data
+        document.getElementById('page-title').innerText =
+            `Bachelor of Engineering: Computer Engineering (${DATA.meta.curriculumYear})`;
 
-        // Build the dynamic legend
+        // ─── Build the legend from DATA.gridLegend + DATA.buckets ───
         const legendContainer = document.getElementById('legend');
-        legendData.forEach(item => {
+        DATA.gridLegend.forEach(item => {
             const legendDiv = document.createElement('div');
             legendDiv.className = 'legend-item';
-            
-            if (item.classes) {
+
+            if (item.colors.length > 1) {
                 const group = document.createElement('div');
                 group.className = 'legend-color-group';
-                item.classes.forEach(cls => {
+                item.colors.forEach(color => {
                     const colorBox = document.createElement('div');
-                    colorBox.className = `legend-color ${cls}`;
+                    colorBox.className = `legend-color bg-${color}`;
                     group.appendChild(colorBox);
                 });
                 legendDiv.appendChild(group);
             } else {
                 const colorBox = document.createElement('div');
-                colorBox.className = `legend-color ${item.class}`;
+                colorBox.className = `legend-color bg-${item.colors[0]}`;
                 legendDiv.appendChild(colorBox);
             }
-            
+
             const label = document.createElement('span');
-            label.innerText = item.name;
+            label.innerText = DATA.buckets[item.bucket].label;
 
             legendDiv.appendChild(label);
             legendContainer.appendChild(legendDiv);
         });
 
-        // Build the main roadmap
+        // ─── Group courses by year, then semester (preserving order) ───
+        const years = {};
+        DATA.courses.forEach(c => {
+            years[c.year] = years[c.year] || {};
+            (years[c.year][c.sem] = years[c.year][c.sem] || []).push(c);
+        });
+
+        function creditLabel(year, sem, courses) {
+            const override = DATA.semesterLabels[`${year}-${sem}`];
+            if (override) return override;
+            return courses.reduce((sum, c) => sum + c.credits, 0);
+        }
+
+        // ─── Build the roadmap grid ───
         const container = document.getElementById('roadmap');
-        curriculumData.years.forEach(yearData => {
+        Object.keys(years).map(Number).sort((a, b) => a - b).forEach(year => {
             const yearCol = document.createElement('div');
             yearCol.className = 'year-column';
-            
+
             const yearTitle = document.createElement('h2');
             yearTitle.className = 'year-title';
-            yearTitle.innerText = `Year ${yearData.year}`;
+            yearTitle.innerText = `Year ${year}`;
             yearCol.appendChild(yearTitle);
 
             const semestersWrapper = document.createElement('div');
             semestersWrapper.className = 'semesters-wrapper';
 
-            yearData.semesters.forEach(semesterData => {
+            Object.keys(years[year]).map(Number).sort((a, b) => a - b).forEach(sem => {
+                const courses = years[year][sem];
+
                 const semCol = document.createElement('div');
                 semCol.className = 'semester-column';
 
                 const semTitle = document.createElement('div');
                 semTitle.className = 'semester-title';
-                semTitle.innerText = `${semesterData.semester}`;
+                semTitle.innerText = `${year}/${sem} (${creditLabel(year, sem, courses)} Credits)`;
                 semCol.appendChild(semTitle);
 
-                semesterData.courses.forEach(course => {
+                courses.forEach(course => {
                     const isCodeValid = /^\d+$/.test(course.code);
 
                     const card = document.createElement(isCodeValid ? 'a' : 'div');
-                    card.className = `course-card ${course.class}`;
-                    card.setAttribute('data-legend', course.legend);
-                    
+                    card.className = `course-card bg-${course.color}`;
+                    card.setAttribute('data-legend', DATA.buckets[course.bucket].label);
+
                     if (isCodeValid) {
-                        card.href = `https://cugetreg.com/S/courses/${course.code}`;
+                        card.href = `${DATA.meta.getRegBase}${course.code}`;
                         card.target = "_blank";
                         card.rel = "noopener noreferrer";
                     }
 
                     const name = document.createElement('div');
                     name.className = 'course-name';
-                    name.innerText = course.name;
+                    name.innerText = course.abbr;
 
                     const details = document.createElement('div');
                     details.className = 'course-details';

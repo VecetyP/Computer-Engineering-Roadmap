@@ -10,6 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+    <!-- Single source of truth: all course data lives in curriculum.js -->
+    <script src="curriculum.js"></script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -499,18 +501,12 @@
     <div class="app">
         <header class="header">
             <h1>Computer Engineering Roadmap</h1>
-            <p class="subtitle">Chulalongkorn University · B.Eng. Computer Engineering · Curriculum 2024</p>
+            <p class="subtitle" id="subtitle"></p>
         </header>
 
         <div class="legend-bar" id="legend-bar"></div>
 
-        <nav class="tab-bar" id="tab-bar">
-            <button class="tab active" data-track="complete">🔗 Complete Map</button>
-            <button class="tab" data-track="software">💻 Software & Algorithms</button>
-            <button class="tab" data-track="hardware">⚡ Hardware & Architecture</button>
-            <button class="tab" data-track="math">📐 Math & Science</button>
-            <button class="tab" data-track="language">📝 Language</button>
-        </nav>
+        <nav class="tab-bar" id="tab-bar"></nav>
 
         <div class="filter-bar" id="filter-bar">
             <span class="filter-label">Filter Semesters:</span>
@@ -566,196 +562,68 @@
         </div>
 
         <div class="standalone-note">
-            <span>Not shown:</span> 2100111 Exploring Engineering World · 2100301 Engineering Practice (Junior Standing) · General Ed · Electives · Free Electives · 21st Century Skills
+            <span>Not shown:</span> <span id="omitted-note"></span>
         </div>
     </div>
 
     <script>
     // ═══════════════════════════════════════════════════════
-    //  COURSE DATA
+    //  DATA — all sourced from curriculum.js (window.CURRICULUM)
     // ═══════════════════════════════════════════════════════
-    const courses = {
-        // ── Year 1 Semester 1 ──
-        '2110101': { name: 'Computer Programming', abbr: 'COMP PROG', credits: 3, category: 'bg-purple', year: 1, sem: 1,
-            desc: 'Programming fundamentals with Python and C/C++: data types, control flow, functions, and basic OOP.' },
-        '2301107': { name: 'Calculus I', abbr: 'CALCULUS I', credits: 3, category: 'bg-blue', year: 1, sem: 1,
-            desc: 'Limits, continuity, differentiation, integration, and applications of algebraic and transcendental functions.' },
-        '2304103': { name: 'General Physics I', abbr: 'GEN PHYS I', credits: 3, category: 'bg-blue', year: 1, sem: 1,
-            desc: 'Classical mechanics, Newton\'s laws, energy, momentum, rotation, fluid mechanics, and thermodynamics.' },
-        '2304183': { name: 'General Physics Lab I', abbr: 'PHYS LAB I', credits: 1, category: 'bg-blue', year: 1, sem: 1,
-            desc: 'Experiments in mechanics, fluid dynamics, oscillations, sound, and thermal properties.' },
-        '5500111': { name: 'Experiential English I', abbr: 'EXP ENG I', credits: 3, category: 'bg-olive', year: 1, sem: 1,
-            desc: 'Integrated English skills: reading comprehension, vocabulary, paragraph writing, listening, and speaking.' },
+    const DATA = window.CURRICULUM;
 
-        // ── Year 1 Semester 2 ──
-        '2110215': { name: 'Programming Methodology I', abbr: 'PROG METH I', credits: 3, category: 'bg-purple', year: 1, sem: 2,
-            desc: 'OOP principles: classes, inheritance, polymorphism, interfaces, exception handling, and design patterns (Java/C++).' },
-        '2110221': { name: 'Computer Engineering Essentials', abbr: 'COM ENG ESS', credits: 3, category: 'bg-pink', year: 1, sem: 2,
-            desc: 'Overview of hardware, software, algorithms, networks, AI, embedded systems, and cybersecurity.' },
-        '2301108': { name: 'Calculus II', abbr: 'CALCULUS II', credits: 3, category: 'bg-blue', year: 1, sem: 2,
-            desc: 'Sequences, series, Taylor expansion, vectors in 3D, multivariable calculus, and intro to differential equations.' },
-        '2304104': { name: 'General Physics II', abbr: 'GEN PHYS II', credits: 3, category: 'bg-blue', year: 1, sem: 2,
-            desc: 'Electrostatics, electric circuits, electromagnetism, waves, optics, and modern physics.' },
-        '2304184': { name: 'General Physics Lab II', abbr: 'PHYS LAB II', credits: 1, category: 'bg-blue', year: 1, sem: 2,
-            desc: 'Lab experiments in circuits, semiconductors, lenses, diffraction, polarization, and electromagnetic induction.' },
-        '2302127': { name: 'General Chemistry', abbr: 'GEN CHEM', credits: 3, category: 'bg-blue', year: 1, sem: 2,
-            desc: 'Stoichiometry, atomic theory, states of matter, equilibrium, kinetics, bonding, and periodic trends.' },
-        '2302163': { name: 'General Chemistry Lab', abbr: 'CHEM LAB', credits: 1, category: 'bg-blue', year: 1, sem: 2,
-            desc: 'Qualitative analysis, gas diffusion, crystal structures, equilibrium, acid-base titrations, and pH measurement.' },
-        '5500112': { name: 'Experiential English II', abbr: 'EXP ENG II', credits: 3, category: 'bg-olive', year: 1, sem: 2,
-            desc: 'Advanced English skills: synthesizing information, structured presentations, and analytical writing.' },
-
-        // ── Year 2 Semester 1 ──
-        '2110200': { name: 'Discrete Structures', abbr: 'DISCRETE', credits: 3, category: 'bg-purple', year: 2, sem: 1,
-            desc: 'Sets, relations, proofs, combinatorics, recurrence relations, graph theory, trees, and number theory.' },
-        '2110211': { name: 'Intro to Data Structures', abbr: 'DATA STRUCT', credits: 3, category: 'bg-teal', year: 2, sem: 1,
-            desc: 'Arrays, stacks, queues, linked lists, trees (BST, AVL, B-tree), sorting algorithms, and hash tables.' },
-        '2603284': { name: 'Statistics for Physical Science', abbr: 'STATISTICS', credits: 3, category: 'bg-blue', year: 2, sem: 1,
-            desc: 'Probability theory, random variables, distributions, statistical inference, ANOVA, and regression.' },
-        '2110251': { name: 'Digital Computer Logic', abbr: 'DIG LOGIC', credits: 3, category: 'bg-teal', year: 2, sem: 1,
-            desc: 'Boolean algebra, logic gates, Karnaugh maps, combinational and sequential logic, flip-flops, and counters.' },
-        '2110263': { name: 'Digital Logic Lab I', abbr: 'DIG LOGIC LAB', credits: 1, category: 'bg-teal', year: 2, sem: 1,
-            desc: 'Hands-on with digital logic ICs, breadboards, combinational circuits, flip-flops, and state machines.' },
-
-        // ── Year 2 Semester 2 ──
-        '2110201': { name: 'Comp Engineering Math I', abbr: 'CE MATH I', credits: 3, category: 'bg-teal', year: 2, sem: 2,
-            desc: 'Linear algebra: matrices, eigenvalues/eigenvectors, SVD, vector spaces, and orthogonality.' },
-        '2110327': { name: 'Algorithm Design', abbr: 'ALGO DESIGN', credits: 3, category: 'bg-purple', year: 2, sem: 2,
-            desc: 'Complexity analysis, divide & conquer, greedy, dynamic programming, graph algorithms, and NP-completeness.' },
-        '2110322': { name: 'Database Systems', abbr: 'DB SYS', credits: 3, category: 'bg-teal', year: 2, sem: 2,
-            desc: 'Relational model, SQL, ER modeling, normalization (1NF–BCNF), transactions, and B+ tree indexing.' },
-        '2110313': { name: 'Operating Systems', abbr: 'OS', credits: 3, category: 'bg-red', year: 2, sem: 2,
-            desc: 'Processes, threads, scheduling, synchronization, deadlocks, memory management, and file systems.' },
-        '2110352': { name: 'Computer System Architecture', abbr: 'COM SYS ARCH', credits: 3, category: 'bg-teal', year: 2, sem: 2,
-            desc: 'ISA (RISC-V), datapath design, pipelining, cache architecture, virtual memory, and multiprocessor systems.' },
-        '2110363': { name: 'Hardware Synthesis Lab I', abbr: 'HW SYN LAB', credits: 1, category: 'bg-teal', year: 2, sem: 2,
-            desc: 'Verilog/VHDL on FPGA: simulation, synthesis of pipelined CPU components and peripheral interfaces.' },
-        '5500208': { name: 'Communication & Presentation Skills', abbr: 'COM PRES', credits: 3, category: 'bg-olive', year: 2, sem: 2,
-            desc: 'Professional English presentations, technical pitching, visual aid design, and workplace discourse.' },
-
-        // ── Year 3 Semester 1 ──
-        '2110203': { name: 'Comp Engineering Math II', abbr: 'CE MATH II', credits: 3, category: 'bg-teal', year: 3, sem: 1,
-            desc: 'Optimization, linear/integer programming, stochastic processes, estimation, and hypothesis testing.' },
-        '2110423': { name: 'Software Engineering', abbr: 'SOFTWARE ENG', credits: 3, category: 'bg-teal', year: 3, sem: 1,
-            desc: 'Software design tools, modular design, testing, reliability models, cost estimation, and maintenance.' },
-        '2110318': { name: 'Distributed Systems Essentials', abbr: 'DIS SYS', credits: 1, category: 'bg-red', year: 3, sem: 1,
-            desc: 'Client-server, message passing, clock sync, distributed transactions, replication, and web services.' },
-        '2110471': { name: 'Computer Networks', abbr: 'COMP NET', credits: 3, category: 'bg-red', year: 3, sem: 1,
-            desc: 'Network architectures, protocols, LAN/WAN, client-server/P2P, security, and wireless computing.' },
-        '2110366': { name: 'Embedded System Lab', abbr: 'EMBEDDED LAB', credits: 1, category: 'bg-teal', year: 3, sem: 1,
-            desc: 'Firmware on microcontrollers, interfacing buses, sensors, actuators, serial/Wi-Fi communication.' },
-
-        // ── Year 3 Semester 2 ──
-        '5500308': { name: 'Technical Writing for Engineering', abbr: 'TECH WRIT', credits: 3, category: 'bg-olive', year: 3, sem: 2,
-            desc: 'Technical essays, engineering reports, research writing, and experimental result documentation.' },
-
-        // ── Year 4 ──
-        '2110488': { name: 'Capstone Project I', abbr: 'CAP PROJ I', credits: 1, category: 'bg-purple', year: 4, sem: 1,
-            desc: 'Problem definition, project proposal, system design, architectural modeling, and initial implementation.' },
-        '2110489': { name: 'Capstone Project II', abbr: 'CAP PROJ II', credits: 3, category: 'bg-purple', year: 4, sem: 2,
-            desc: 'Full implementation, testing, evaluation, final thesis report, and project defense/presentation.' },
-    };
+    // Fast lookup: course key -> course object
+    const courseByKey = {};
+    DATA.courses.forEach(c => { courseByKey[c.key] = c; });
 
     // ═══════════════════════════════════════════════════════
-    //  PREREQUISITE EDGES
-    // ═══════════════════════════════════════════════════════
-    const allEdges = [
-        // ── Hard Prerequisites ──
-        { from: '2110101', to: '2110215', type: 'prereq' },
-        { from: '2110101', to: '2110211', type: 'prereq' },
-        { from: '2110211', to: '2110327', type: 'prereq' },
-        { from: '2110200', to: '2110327', type: 'prereq' },
-        { from: '2110211', to: '2110322', type: 'prereq' },
-        { from: '2110211', to: '2110313', type: 'prereq' },
-        { from: '2110221', to: '2110313', type: 'prereq' },
-        { from: '2110313', to: '2110318', type: 'prereq' },
-        { from: '2110221', to: '2110471', type: 'prereq' },
-        { from: '2110251', to: '2110352', type: 'prereq' },
-        { from: '2110263', to: '2110363', type: 'prereq' },
-        { from: '2110263', to: '2110366', type: 'prereq' },
-        { from: '2301107', to: '2301108', type: 'prereq' },
-        { from: '5500111', to: '5500112', type: 'prereq' },
-        { from: '5500112', to: '5500208', type: 'prereq' },
-        { from: '5500208', to: '5500308', type: 'prereq' },
-        { from: '2110488', to: '2110489', type: 'prereq' },
-
-        // ── Recommended / Curriculum Flow ──
-        { from: '2301108', to: '2110201', type: 'recommended' },
-        { from: '2301108', to: '2603284', type: 'recommended' },
-        { from: '2304103', to: '2304104', type: 'recommended' },
-        { from: '2304183', to: '2304184', type: 'recommended' },
-        { from: '2110101', to: '2110200', type: 'recommended' },
-        { from: '2110201', to: '2110203', type: 'recommended' },
-        { from: '2110215', to: '2110423', type: 'recommended' },
-
-        // ── Corequisites ──
-        { from: '2110251', to: '2110263', type: 'coreq' },
-        { from: '2110352', to: '2110363', type: 'coreq' },
-        { from: '2304103', to: '2304183', type: 'coreq' },
-        { from: '2304104', to: '2304184', type: 'coreq' },
-        { from: '2302127', to: '2302163', type: 'coreq' },
-    ];
-
-    // ═══════════════════════════════════════════════════════
-    //  COLORS & LABELS
+    //  COLORS & LABELS  (view-specific hex; names come from data)
     // ═══════════════════════════════════════════════════════
     const categoryColors = {
-        'bg-purple': '#a78bfa',
-        'bg-teal':   '#2dd4bf',
-        'bg-blue':   '#60a5fa',
-        'bg-pink':   '#f472b6',
-        'bg-red':    '#fb7185',
-        'bg-olive':  '#bef264',
+        'purple': '#a78bfa',
+        'teal':   '#2dd4bf',
+        'blue':   '#60a5fa',
+        'pink':   '#f472b6',
+        'red':    '#fb7185',
+        'olive':  '#bef264',
     };
 
     const categoryBorders = {
-        'bg-purple': '#8b5cf6',
-        'bg-teal':   '#14b8a6',
-        'bg-blue':   '#3b82f6',
-        'bg-pink':   '#ec4899',
-        'bg-red':    '#f43f5e',
-        'bg-olive':  '#a3e635',
+        'purple': '#8b5cf6',
+        'teal':   '#14b8a6',
+        'blue':   '#3b82f6',
+        'pink':   '#ec4899',
+        'red':    '#f43f5e',
+        'olive':  '#a3e635',
     };
 
-    const categoryLabels = {
-        'bg-purple': 'Core · Theory & Algorithms',
-        'bg-teal':   'Core · Systems & Applied',
-        'bg-blue':   'Math & Science Foundation',
-        'bg-pink':   'Engineering Foundation',
-        'bg-red':    'Information Technology',
-        'bg-olive':  'Language & Communication',
-    };
+    // color name -> human label for the legend (from data)
+    const categoryLabels = DATA.dagCategories;
 
     // ═══════════════════════════════════════════════════════
-    //  TRACK DEFINITIONS
+    //  TRACK DEFINITIONS  (built from data)
+    //   - "complete" is every course flagged dag:true
+    //   - the rest come straight from DATA.tracks
     // ═══════════════════════════════════════════════════════
     const tracks = {
         complete: {
-            subtitle: 'All courses with prerequisite, recommended, and corequisite relationships across the 4-year curriculum',
-            courses: Object.keys(courses),
-            rankSep: 65, nodeSep: 35,
-        },
-        software: {
-            subtitle: 'Programming → Data Structures → Algorithms, Databases, OS, Networking, Distributed Systems, and Software Engineering',
-            courses: ['2110101','2110215','2110200','2110211','2110327','2110322','2110313','2110318','2110221','2110471','2110423','2110488','2110489'],
-            rankSep: 80, nodeSep: 45,
-        },
-        hardware: {
-            subtitle: 'Digital logic design → Computer architecture, FPGA synthesis, and embedded systems',
-            courses: ['2110251','2110263','2110352','2110363','2110366'],
-            rankSep: 100, nodeSep: 60,
-        },
-        math: {
-            subtitle: 'Calculus, physics, chemistry, statistics, and computer engineering mathematics',
-            courses: ['2301107','2301108','2304103','2304104','2304183','2304184','2302127','2302163','2603284','2110201','2110203'],
-            rankSep: 75, nodeSep: 40,
-        },
-        language: {
-            subtitle: 'English language skills from experiential learning to technical engineering writing',
-            courses: ['5500111','5500112','5500208','5500308'],
-            rankSep: 100, nodeSep: 60,
+            label: DATA.completeTrack.label,
+            subtitle: DATA.completeTrack.subtitle,
+            keys: DATA.courses.filter(c => c.dag).map(c => c.key),
+            rankSep: DATA.completeTrack.rankSep,
+            nodeSep: DATA.completeTrack.nodeSep,
         },
     };
+    Object.entries(DATA.tracks).forEach(([id, t]) => {
+        tracks[id] = {
+            label: t.label,
+            subtitle: t.subtitle,
+            keys: t.keys.filter(k => courseByKey[k]),
+            rankSep: t.rankSep,
+            nodeSep: t.nodeSep,
+        };
+    });
+    const trackOrder = ['complete', ...Object.keys(DATA.tracks)];
 
     // ═══════════════════════════════════════════════════════
     //  CYTOSCAPE STYLE
@@ -876,29 +744,30 @@
 
     // ═══════════════════════════════════════════════════════
     //  BUILD ELEMENTS FOR A TRACK (STABLE LAYOUT)
+    //   Node id = course KEY. Edges reference keys directly.
     // ═══════════════════════════════════════════════════════
     function getElements(trackId) {
         const track = tracks[trackId];
-        const courseIds = new Set(track.courses);
+        const keySet = new Set(track.keys);
 
-        const nodes = track.courses
-            .filter(id => courses[id])
-            .map(id => {
-                const c = courses[id];
+        const nodes = track.keys
+            .filter(k => courseByKey[k])
+            .map(k => {
+                const c = courseByKey[k];
                 return {
                     data: {
-                        id,
-                        label: `${id}\n${c.abbr}`,
-                        category: c.category,
+                        id: k,
+                        label: `${c.code}\n${c.abbr}`,
+                        category: c.color,
                     }
                 };
             });
 
-        const edges = allEdges
-            .filter(e => courseIds.has(e.from) && courseIds.has(e.to))
+        const edges = DATA.edges
+            .filter(e => keySet.has(e.from) && keySet.has(e.to))
             .map(e => ({
                 data: {
-                    id: `${e.from}-${e.to}`,
+                    id: `${e.from}__${e.to}`,
                     source: e.from,
                     target: e.to,
                     type: e.type,
@@ -916,7 +785,7 @@
 
         cy.batch(() => {
             cy.nodes().forEach(node => {
-                const c = courses[node.id()];
+                const c = courseByKey[node.id()];
                 if (!c) return;
                 const isMatch = activeFilters.has(`${c.year}-${c.sem}`);
                 if (isMatch) {
@@ -1045,45 +914,46 @@
 
     // ═══════════════════════════════════════════════════════
     //  INFO PANEL
+    //   `courseKey` is a course KEY (the node id).
     // ═══════════════════════════════════════════════════════
-    function showInfoPanel(courseId) {
-        const course = courses[courseId];
+    function showInfoPanel(courseKey) {
+        const course = courseByKey[courseKey];
         if (!course) return;
-        selectedNode = courseId;
+        selectedNode = courseKey;
 
-        const color = categoryColors[course.category] || '#94a3b8';
-        const trackCourses = new Set(tracks[currentTrack].courses);
+        const color = categoryColors[course.color] || '#94a3b8';
+        const trackKeys = new Set(tracks[currentTrack].keys);
 
         // Incoming edges: prerequisites OF this course
-        const prereqs = allEdges
-            .filter(e => e.to === courseId && trackCourses.has(e.from) && courses[e.from])
-            .map(e => ({ id: e.from, ...courses[e.from], edgeType: e.type }));
+        const prereqs = DATA.edges
+            .filter(e => e.to === courseKey && trackKeys.has(e.from) && courseByKey[e.from])
+            .map(e => ({ key: e.from, ...courseByKey[e.from], edgeType: e.type }));
 
         // Outgoing edges: courses that NEED this course
-        const dependents = allEdges
-            .filter(e => e.from === courseId && trackCourses.has(e.to) && courses[e.to])
-            .map(e => ({ id: e.to, ...courses[e.to], edgeType: e.type }));
+        const dependents = DATA.edges
+            .filter(e => e.from === courseKey && trackKeys.has(e.to) && courseByKey[e.to])
+            .map(e => ({ key: e.to, ...courseByKey[e.to], edgeType: e.type }));
 
-        const isCodeValid = /^\d+$/.test(courseId);
+        const isCodeValid = /^\d+$/.test(course.code);
         const panel = document.getElementById('info-inner');
 
         panel.innerHTML = `
             <div class="info-header">
                 <button class="info-close" onclick="hideInfoPanel()">×</button>
-                <div class="info-code" style="color:${color}">${courseId}</div>
+                <div class="info-code" style="color:${color}">${course.code}</div>
                 <div class="info-name">${course.name}</div>
                 <div class="info-badges">
                     <span class="badge" style="background:${color}22;color:${color};border:1px solid ${color}33">${course.credits} credit${course.credits > 1 ? 's' : ''}</span>
                     <span class="badge outline">Year ${course.year} · Sem ${course.sem}</span>
                 </div>
             </div>
-            <div class="info-desc">${course.desc}</div>
+            ${course.desc ? `<div class="info-desc">${course.desc}</div>` : ''}
             ${prereqs.length ? `
                 <div class="info-section">
                     <h3>Prerequisites</h3>
                     ${prereqs.map(p => `
-                        <div class="dep-item" onclick="focusNode('${p.id}')">
-                            <span class="dep-code">${p.id}</span>
+                        <div class="dep-item" onclick="focusNode('${p.key}')">
+                            <span class="dep-code">${p.code}</span>
                             <span class="dep-name">${p.abbr}</span>
                             <span class="dep-type ${p.edgeType}">${p.edgeType}</span>
                         </div>
@@ -1094,8 +964,8 @@
                 <div class="info-section">
                     <h3>Leads To</h3>
                     ${dependents.map(d => `
-                        <div class="dep-item" onclick="focusNode('${d.id}')">
-                            <span class="dep-code">${d.id}</span>
+                        <div class="dep-item" onclick="focusNode('${d.key}')">
+                            <span class="dep-code">${d.code}</span>
                             <span class="dep-name">${d.abbr}</span>
                             <span class="dep-type ${d.edgeType}">${d.edgeType}</span>
                         </div>
@@ -1103,7 +973,7 @@
                 </div>
             ` : ''}
             ${isCodeValid ? `
-                <a class="cugetreg-link" href="https://cugetreg.com/S/courses/${courseId}" target="_blank" rel="noopener noreferrer">
+                <a class="cugetreg-link" href="${DATA.meta.getRegBase}${course.code}" target="_blank" rel="noopener noreferrer">
                     View on CU Get Reg ↗
                 </a>
             ` : ''}
@@ -1117,11 +987,11 @@
         document.getElementById('info-panel').classList.remove('visible');
     }
 
-    function focusNode(nodeId) {
-        const node = cy.$('#' + nodeId);
+    function focusNode(nodeKey) {
+        const node = cy.$('#' + nodeKey);
         if (node.length) {
             cy.animate({ center: { eles: node }, zoom: cy.zoom() }, { duration: 350 });
-            showInfoPanel(nodeId);
+            showInfoPanel(nodeKey);
         }
     }
 
@@ -1145,9 +1015,15 @@
         setTimeout(() => renderGraph(trackId), 50);
     }
 
-    // Wire up tabs
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => switchTab(tab.dataset.track));
+    // Build tabs from data
+    const tabBar = document.getElementById('tab-bar');
+    trackOrder.forEach((id, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab' + (i === 0 ? ' active' : '');
+        btn.dataset.track = id;
+        btn.textContent = tracks[id].label;
+        btn.addEventListener('click', () => switchTab(id));
+        tabBar.appendChild(btn);
     });
 
     // ═══════════════════════════════════════════════════════
@@ -1214,8 +1090,12 @@
     });
 
     // ═══════════════════════════════════════════════════════
-    //  LEGEND
+    //  HEADER / LEGEND / FOOTER  (from data)
     // ═══════════════════════════════════════════════════════
+    document.getElementById('subtitle').textContent =
+        `${DATA.meta.university} · ${DATA.meta.program} · Curriculum ${DATA.meta.curriculumYear}`;
+    document.getElementById('omitted-note').textContent = DATA.dagOmittedNote;
+
     const legendBar = document.getElementById('legend-bar');
     Object.entries(categoryLabels).forEach(([cat, label]) => {
         const item = document.createElement('div');
@@ -1231,4 +1111,3 @@
     </script>
 </body>
 </html>
-
