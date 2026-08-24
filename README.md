@@ -9,7 +9,8 @@ Interactive visualizations of the Chulalongkorn University Computer Engineering 
 
 ## Data: one source of truth
 
-Both pages read all of their content from **`curriculum.js`**.
+Both pages read all of their content from **`curriculum.js`**. There is no course data hardcoded in the HTML files anymore — edit `curriculum.js` once and both pages update.
+
 ### To change a course number or name
 
 1. Open `curriculum.js` and find the course in the `courses` array (search by its `key`, current `code`, or `name`).
@@ -36,7 +37,22 @@ Full field-by-field documentation is in the comment block at the top of `curricu
 - Three edge types: hard prerequisites, recommended flow, and corequisites
 - DAG track tabs (Software, Hardware, Math, Language) and per-semester filtering
 - Click-through links to CU Get Reg for every course with a real course number
+- Cross-links between the graph and grid views
 - Single-file HTML per page; just open in a browser
+
+## Progress tracking (graph view)
+
+Each course node's info panel has a **Learning Checklist** — the topics that make up that course. Tick them as you learn them and:
+
+- each node fills up left-to-right to show how far through the course you are, and turns green when complete;
+- the header bar shows your **overall %**, courses completed, and the current view's %;
+- once a course's prerequisites are all complete, its dependents highlight with a dashed cyan **"Ready"** border.
+
+Your progress is saved in the browser (localStorage), so it persists between visits on that browser. Use **Export** to save it to a file (handy for backup or moving to another computer/browser), **Import** to load it back, and **Reset** to clear everything.
+
+### Editing the checklists
+
+The topic lists live in `curriculum.js` under `courseTopics`, keyed by course `key`. Add, remove, or rename topics freely — each is one checkbox. Topics were seeded from CU Get Reg course-content overviews; the courses listed in `topicsToVerify` had no page available and were seeded from standard syllabi, so they show a "verify" note in their panel until confirmed.
 
 ## Usage
 

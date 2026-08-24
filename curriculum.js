@@ -359,6 +359,61 @@ window.CURRICULUM = {
     rankSep: 65, nodeSep: 35,
   },
 
+  /* =========================================================================
+   *  COURSE TOPICS  —  the learning checklist shown in each course's panel.
+   *  Keyed by course `key`. Seeded from CU Get Reg course-content overviews.
+   *  Edit freely: add / remove / rename topics; each is one checkbox.
+   *
+   *  NOTE: a checkbox's saved "learned" state is keyed by the TOPIC TEXT
+   *  (per course). Renaming a topic later starts it fresh; reordering is safe.
+   *
+   *  Courses in `topicsToVerify` had no CU Get Reg page available and were
+   *  seeded from standard syllabi — worth confirming against the real outline.
+   * =======================================================================*/
+  topicsToVerify: ['algo', 'db_sys', 'os', 'com_sys_arch', 'hw_syn_lab', 'gen_phys_lab2'],
+
+  courseTopics: {
+    // ── Year 1 ──
+    comp_prog:     ['Computer System Concepts', 'Data Types & Variables', 'Operators & Expressions', 'Control Structures', 'Loops & Iteration', 'Functions & Recursion', 'Debugging & Error Fixing', 'Program Design'],
+    calc1:         ['Limits', 'Continuity', 'Derivatives', 'Differentiation Rules', 'Applications Of Derivatives', 'Integration', 'Techniques Of Integration', 'Improper Integrals'],
+    gen_phys1:     ['Math For Physics', 'Kinematics', 'Newtonian Mechanics', 'Work And Energy', 'Kinetic Theory Of Gases', 'Thermodynamics', 'Heat Transfer', 'Properties Of Matter'],
+    gen_phys_lab1: ['Measurement And Precision', 'Statistical Analysis', 'Simple Harmonic Motion', 'Rotational Motion', 'Wave Phenomena', 'Sound', 'Heat', 'Fluid Mechanics'],
+    exp_eng1:      ['Reading Strategies', 'Skimming And Scanning', 'Making Inferences', 'Paragraph Structure', 'Narrative Writing', 'Opinion Writing', 'Group Presentations', 'Listening Comprehension'],
+    prog_meth1:    ['Object-Oriented Programming', 'Inheritance & Polymorphism', 'Error & Exception Handling', 'Event-Driven Programming', 'Concurrent Programming', 'Using APIs', 'Programming Tools', 'Coding Style & Practice'],
+    com_eng_ess:   ['Hardware & Software', 'Logic & Processors', 'Algorithms & Programs', 'Databases', 'Networks & Internet', 'AI & Robotics', 'Embedded & Data Centers', 'Security & Ethics'],
+    calc2:         ['Mathematical Induction', 'Sequences And Series', 'Taylor Series', 'Numerical Integration', 'Vectors And 3D Geometry', 'Vector-Valued Functions', 'Multivariable Calculus', 'Differential Equations'],
+    gen_phys2:     ['Electrostatics', 'DC Circuits', 'AC Circuits', 'Electromagnetism', 'Magnetic Materials', 'Waves And Sound', 'Electromagnetic Waves', 'Modern Physics'],
+    gen_phys_lab2: ['Electric Fields', 'DC Circuit Measurements', "Ohm's Law", 'Capacitance', 'Magnetic Fields', 'Electromagnetic Induction', 'Geometric Optics', 'Interference And Diffraction'],
+    gen_chem:      ['Stoichiometry', 'Atomic Structure', 'Chemical Bonding', 'States Of Matter', 'Thermochemistry', 'Chemical Equilibrium', 'Acid-Base Chemistry', 'Redox And Kinetics'],
+    gen_chem_lab:  ['Qualitative Analysis', 'Gas Diffusion', 'Crystal Structures', 'Chemical Equilibrium', 'Indicators', 'Acid-Base Titration', 'pH Measurement', 'Hydrolysis'],
+    exp_eng2:      ['Reading For Detail', 'Analyzing Sources', 'Synthesizing Information', 'Problem-Solution Paragraphs', 'Cause-Effect Paragraphs', 'Roleplay Dialogues', 'Speaking Practice', 'Oral Presentation'],
+
+    // ── Year 2 ──
+    discrete:      ['Sets & Relations', 'Functions', 'Theorems & Proofs', 'Counting & Combinatorics', 'Inclusion-Exclusion', 'Recurrence Relations', 'Generating Functions', 'Graphs & Trees', 'Number Theory'],
+    data_struct:   ['Arrays & Linear Allocation', 'Stacks & Queues', 'Linked Lists', 'String & Pattern Matching', 'Trees & Traversal', 'AVL & B-Trees', 'Searching Algorithms', 'Sorting Algorithms', 'Heaps & Hashing'],
+    stats:         ['Probability Theory', 'Random Variables', 'Probability Distributions', 'Estimation Basics', 'Hypothesis Testing', 'Analysis Of Variance', 'Regression And Correlation', 'Statistical Quality Control'],
+    dig_logic:     ['Number Systems', 'Logic Gates', 'Boolean Algebra', 'Karnaugh Maps', 'Combinational Circuits', 'Multiplexers & Decoders', 'Flip-Flops', 'Sequential Circuits', 'Counters & Registers'],
+    dig_logic_lab: ['Logic Gates & ICs', 'Breadboard Prototyping', 'Combinational Circuits', 'Circuit Testing', 'Flip-Flops', 'Sequential Circuits', 'Counters & Registers', 'Lab Documentation'],
+    ce_math1:      ['Vectors And Matrices', 'Matrix Operations', 'Systems Of Linear Equations', 'Vector Spaces', 'Rank And Basis', 'Orthogonality And Projections', 'Determinants And Eigenvalues', 'Singular Value Decomposition'],
+    algo:          ['Algorithm Analysis', 'Asymptotic Complexity', 'Divide & Conquer', 'Greedy Algorithms', 'Dynamic Programming', 'Graph Algorithms', 'Shortest Paths', 'NP-Completeness'],
+    db_sys:        ['Database Concepts', 'ER Modeling', 'Relational Model', 'SQL Queries', 'Normalization', 'Transactions & Concurrency', 'Indexing & Storage', 'Query Optimization'],
+    os:            ['OS Structure & Overview', 'Processes & Threads', 'CPU Scheduling', 'Synchronization', 'Deadlocks', 'Memory Management', 'Virtual Memory', 'File Systems'],
+    com_sys_arch:  ['Instruction Set Architecture', 'CPU Datapath & Control', 'Pipelining', 'Memory Hierarchy', 'Cache Design', 'Virtual Memory', 'I/O & Buses', 'Parallel Processing'],
+    hw_syn_lab:    ['Verilog HDL Basics', 'Combinational Logic Design', 'Sequential Circuit Design', 'Finite State Machines', 'Testbenches And Simulation', 'FPGA Synthesis Flow', 'Timing And Constraints', 'On-Board Deployment'],
+
+    // ── Year 3 ──
+    ce_math2:      ['Optimization Methods', 'Linear Programming', 'Integer Optimization', 'Probability Theory', 'Continuous Random Variables', 'Sampling And Estimation', 'Hypothesis Testing', 'Correlation And Regression'],
+    software_eng:  ['Top-Down Design', 'Modular Design', 'Software Debugging', 'Test Data Generation', 'Reliability Models', 'Availability Models', 'Cost Estimation', 'Software Maintenance'],
+    dist_sys:      ['Distributed Architectures', 'Message Passing', 'Remote Invocation', 'Clocks And Event Ordering', 'Group Communication', 'Concurrency Control', 'Distributed Transactions', 'Consensus And Replication'],
+    comp_net:      ['Networking Overview', 'Network Architecture', 'Protocol Design', 'LAN And WAN', 'Client-Server Models', 'Data Security', 'Wireless And Mobile'],
+    embedded_lab:  ['Microprocessor Firmware', 'Basic Circuit Design', 'Bus And Memory Interfacing', 'Sensor Integration', 'Relay Control', 'Serial Communication', 'WiFi Connectivity'],
+    tech_writ:     ['Paraphrasing And Summarizing', 'Defining Technical Terms', 'Process Descriptions', 'Writing Abstracts', 'Methods And Results', 'Discussion And Conclusions', 'Data Visualization', 'Formal Report Writing'],
+
+    // ── Year 4 ──
+    cap_proj1:     ['Problem Identification', 'Requirements Gathering', 'Technical Proposal', 'Project Planning', 'Team Coordination', 'Prototype Development', 'Progress Reporting'],
+    cap_proj2:     ['System Implementation', 'Integration And Testing', 'Iterative Refinement', 'Performance Evaluation', 'Documentation', 'Final Demonstration', 'Project Presentation'],
+  },
+
   /* ---- Footer note: what the DAG intentionally leaves out -----------------*/
   dagOmittedNote: 'General Ed · Electives · Free Electives · 21st Century Skills · Exploring Engineering World · Engineering Practice · Software Engineering Lab',
 };

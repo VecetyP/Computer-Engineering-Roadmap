@@ -183,7 +183,15 @@
             border: 1px solid rgba(255,255,255,0.04);
         }
 
-        #cy { width: 100%; height: 100%; }
+        #cy { width: 100%; height: 100%; position: relative; z-index: 2; }
+
+        /* Rings sit BELOW the cytoscape layer so edges/arrows draw on top of them */
+        #cy-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
 
         .reset-btn {
             position: absolute;
@@ -530,6 +538,129 @@
         }
 
         .standalone-note span { color: #64748b; font-weight: 500; }
+
+        /* ── Progress summary bar ── */
+        .progress-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+        .ps-bar {
+            flex: 1;
+            min-width: 110px;
+            height: 7px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .ps-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #34d399, #2dd4bf, #60a5fa);
+            border-radius: 4px;
+            transition: width 0.35s ease;
+        }
+        .ps-text { font-size: 0.72rem; color: #94a3b8; white-space: nowrap; }
+        .ps-text b { color: #e2e8f0; }
+        .ps-tools { display: flex; gap: 5px; }
+        .ps-tools button, #ps-import-label {
+            padding: 4px 9px;
+            font-size: 0.66rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .ps-tools button:hover, #ps-import-label:hover {
+            background: rgba(255,255,255,0.08);
+            color: #f1f5f9;
+        }
+        .state-legend { display: flex; gap: 10px; }
+        .state-legend .sl {
+            font-size: 0.63rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .state-legend .sl::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            border: 2px solid;
+        }
+        .state-legend .sl.done::before { border-color: #34d399; }
+        .state-legend .sl.progress::before { border-color: #fbbf24; }
+        .state-legend .sl.ready::before { border-color: #22d3ee; border-style: dashed; }
+
+        /* ── Learning checklist (info panel) ── */
+        .checklist-head { display: flex; gap: 12px; align-items: center; }
+        .checklist-head .ring { flex-shrink: 0; }
+        .cl-count { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+        .cl-actions { display: flex; gap: 5px; margin-top: 6px; }
+        .cl-actions button {
+            padding: 3px 8px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #94a3b8;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .cl-actions button:hover { background: rgba(255,255,255,0.08); color: #f1f5f9; }
+        .topic-list { display: flex; flex-direction: column; gap: 3px; }
+        .topic-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .topic-row:hover { background: rgba(255,255,255,0.05); }
+        .topic-check {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1.5px solid rgba(255,255,255,0.25);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .topic-row.checked .topic-check { background: #34d399; border-color: #34d399; }
+        .topic-row.checked .topic-check::after {
+            content: '✓';
+            color: #0a0a14;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+        .topic-text { font-size: 0.74rem; color: #cbd5e1; }
+        .topic-row.checked .topic-text { color: #6b7280; text-decoration: line-through; }
+        .verify-flag {
+            font-size: 0.62rem;
+            color: #fbbf24;
+            background: rgba(251,191,36,0.1);
+            border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 5px;
+            padding: 4px 7px;
+        }
     </style>
 </head>
 <body>
@@ -543,6 +674,21 @@
         </header>
 
         <div class="legend-bar" id="legend-bar"></div>
+
+        <div class="progress-summary">
+            <div class="ps-bar"><div class="ps-fill" id="ps-fill"></div></div>
+            <div class="ps-text" id="ps-text"></div>
+            <div class="state-legend">
+                <span class="sl done">Done</span>
+                <span class="sl progress">In progress</span>
+                <span class="sl ready">Ready</span>
+            </div>
+            <div class="ps-tools">
+                <button id="ps-export" title="Download your progress as a file">⬇ Export</button>
+                <label id="ps-import-label" title="Load progress from a file">⬆ Import<input type="file" id="ps-import" accept="application/json" hidden></label>
+                <button id="ps-reset" title="Clear all progress">↺ Reset</button>
+            </div>
+        </div>
 
         <nav class="tab-bar" id="tab-bar"></nav>
 
@@ -580,6 +726,7 @@
                 <div class="graph-subtitle" id="graph-subtitle"></div>
                 <div class="cy-wrapper">
                     <div id="cy"></div>
+                    <canvas id="cy-overlay"></canvas>
                     <button class="reset-btn" onclick="resetView()" title="Fit graph to viewport">⊡</button>
                 </div>
             </div>
@@ -610,38 +757,81 @@
     // ═══════════════════════════════════════════════════════
     const DATA = window.CURRICULUM;
 
-    // Fast lookup: course key -> course object
+    // Fast lookup: course key -> course object (with topics attached)
     const courseByKey = {};
-    DATA.courses.forEach(c => { courseByKey[c.key] = c; });
+    DATA.courses.forEach(c => {
+        c.topics = DATA.courseTopics[c.key] || [];
+        courseByKey[c.key] = c;
+    });
+    const verifySet = new Set(DATA.topicsToVerify || []);
+
+    // ═══════════════════════════════════════════════════════
+    //  PROGRESS STORAGE  (localStorage, per-browser)
+    //   Shape: { [courseKey]: { [topicText]: true } }
+    // ═══════════════════════════════════════════════════════
+    const LS_KEY = 'cpRoadmap.progress.v1';
+    let progress = loadProgress();
+
+    function loadProgress() {
+        try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; }
+        catch (e) { return {}; }
+    }
+    function saveProgress() {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(progress)); } catch (e) {}
+    }
+    function isLearned(key, tp) { return !!(progress[key] && progress[key][tp]); }
+    function setLearned(key, tp, val) {
+        if (val) { (progress[key] = progress[key] || {})[tp] = true; }
+        else if (progress[key]) {
+            delete progress[key][tp];
+            if (!Object.keys(progress[key]).length) delete progress[key];
+        }
+        saveProgress();
+    }
+
+    // ── Progress math ──
+    function courseFraction(key) {
+        const t = courseByKey[key].topics || [];
+        if (!t.length) return 0;
+        return t.filter(tp => isLearned(key, tp)).length / t.length;
+    }
+    function courseLearned(key) {
+        const t = courseByKey[key].topics || [];
+        return t.filter(tp => isLearned(key, tp)).length;
+    }
+    function courseDone(key) {
+        const t = courseByKey[key].topics || [];
+        return t.length > 0 && t.every(tp => isLearned(key, tp));
+    }
+    // A course is "ready" once every hard prerequisite is done (no prereqs => ready)
+    function prereqsSatisfied(key) {
+        return DATA.edges
+            .filter(e => e.to === key && e.type === 'prereq')
+            .every(e => courseDone(e.from));
+    }
+    function computeState(key) {
+        const f = courseFraction(key);
+        if (f >= 1) return 'done';
+        if (f > 0) return 'progress';
+        return prereqsSatisfied(key) ? 'ready' : 'idle';
+    }
+    function dagCourseKeys() { return DATA.courses.filter(c => c.dag).map(c => c.key); }
 
     // ═══════════════════════════════════════════════════════
     //  COLORS & LABELS  (view-specific hex; names come from data)
     // ═══════════════════════════════════════════════════════
     const categoryColors = {
-        'purple': '#a78bfa',
-        'teal':   '#2dd4bf',
-        'blue':   '#60a5fa',
-        'pink':   '#f472b6',
-        'red':    '#fb7185',
-        'olive':  '#bef264',
+        'purple': '#a78bfa', 'teal': '#2dd4bf', 'blue': '#60a5fa',
+        'pink': '#f472b6', 'red': '#fb7185', 'olive': '#bef264',
     };
-
     const categoryBorders = {
-        'purple': '#8b5cf6',
-        'teal':   '#14b8a6',
-        'blue':   '#3b82f6',
-        'pink':   '#ec4899',
-        'red':    '#f43f5e',
-        'olive':  '#a3e635',
+        'purple': '#8b5cf6', 'teal': '#14b8a6', 'blue': '#3b82f6',
+        'pink': '#ec4899', 'red': '#f43f5e', 'olive': '#a3e635',
     };
-
-    // color name -> human label for the legend (from data)
     const categoryLabels = DATA.dagCategories;
 
     // ═══════════════════════════════════════════════════════
     //  TRACK DEFINITIONS  (built from data)
-    //   - "complete" is every course flagged dag:true
-    //   - the rest come straight from DATA.tracks
     // ═══════════════════════════════════════════════════════
     const tracks = {
         complete: {
@@ -654,11 +844,9 @@
     };
     Object.entries(DATA.tracks).forEach(([id, t]) => {
         tracks[id] = {
-            label: t.label,
-            subtitle: t.subtitle,
+            label: t.label, subtitle: t.subtitle,
             keys: t.keys.filter(k => courseByKey[k]),
-            rankSep: t.rankSep,
-            nodeSep: t.nodeSep,
+            rankSep: t.rankSep, nodeSep: t.nodeSep,
         };
     });
     const trackOrder = ['complete', ...Object.keys(DATA.tracks)];
@@ -685,19 +873,19 @@
                 'padding': '12px',
                 'text-max-width': '120px',
                 'border-width': 2,
+                'background-color': 'data(catcolor)',
                 'background-opacity': 0.92,
                 'transition-property': 'opacity, border-width, border-color',
                 'transition-duration': '0.2s',
             }
         },
-        // Category-specific node colors
-        ...Object.entries(categoryColors).map(([cat, color]) => ({
+        // Category border color (course identity)
+        ...Object.entries(categoryBorders).map(([cat, color]) => ({
             selector: `node[category = "${cat}"]`,
-            style: {
-                'background-color': color,
-                'border-color': categoryBorders[cat] || color,
-            }
+            style: { 'border-color': color }
         })),
+        // "Ready to take" = prerequisites complete, not yet started (progress ring is 0)
+        { selector: 'node.state-ready', style: { 'border-color': '#22d3ee', 'border-width': 2.5, 'border-style': 'dashed' } },
         // Base edge style
         {
             selector: 'edge',
@@ -712,24 +900,8 @@
                 'transition-duration': '0.2s',
             }
         },
-        {
-            selector: 'edge[type = "prereq"]',
-            style: {
-                'line-style': 'solid',
-                'line-color': 'rgba(255,255,255,0.45)',
-                'target-arrow-color': 'rgba(255,255,255,0.45)',
-                'width': 2.5,
-            }
-        },
-        {
-            selector: 'edge[type = "recommended"]',
-            style: {
-                'line-style': 'dashed',
-                'line-color': 'rgba(255,255,255,0.18)',
-                'target-arrow-color': 'rgba(255,255,255,0.18)',
-                'width': 1.5,
-            }
-        },
+        { selector: 'edge[type = "prereq"]',      style: { 'line-style': 'solid',  'line-color': 'rgba(255,255,255,0.45)', 'target-arrow-color': 'rgba(255,255,255,0.45)', 'width': 2.5 } },
+        { selector: 'edge[type = "recommended"]', style: { 'line-style': 'dashed', 'line-color': 'rgba(255,255,255,0.18)', 'target-arrow-color': 'rgba(255,255,255,0.18)', 'width': 1.5 } },
         {
             selector: 'edge[type = "coreq"]',
             style: {
@@ -742,28 +914,17 @@
                 'width': 1.5,
             }
         },
-        // Semester Filter Dimming (low transparency instead of removing nodes)
-        {
-            selector: 'node.filter-dimmed',
-            style: {
-                'opacity': 0.14,
-            }
-        },
-        {
-            selector: 'edge.filter-dimmed',
-            style: {
-                'opacity': 0.06,
-            }
-        },
-        // Hover Highlighting
+        // Semester filter dimming
+        { selector: 'node.filter-dimmed', style: { 'opacity': 0.14 } },
+        { selector: 'edge.filter-dimmed', style: { 'opacity': 0.06 } },
+        // Hover highlighting
         { selector: '.dimmed', style: { 'opacity': 0.08 } },
         { selector: '.highlighted', style: { 'border-width': 4, 'border-color': '#fbbf24', 'z-index': 999, 'opacity': 1 } },
         { selector: '.connected', style: { 'opacity': 1 } },
         {
             selector: '.connected-edge',
             style: {
-                'opacity': 1,
-                'width': 3,
+                'opacity': 1, 'width': 3,
                 'line-color': 'rgba(251,191,36,0.65)',
                 'target-arrow-color': 'rgba(251,191,36,0.65)',
                 'source-arrow-color': 'rgba(251,191,36,0.65)',
@@ -777,142 +938,191 @@
     let cy = null;
     let currentTrack = 'complete';
     let selectedNode = null;
-    // Semester filters: "1-1" means Year 1 Sem 1, etc. All active by default.
     const activeFilters = new Set(['1-1','1-2','2-1','2-2','3-1','3-2','4-1','4-2']);
 
     // ═══════════════════════════════════════════════════════
-    //  BUILD ELEMENTS FOR A TRACK (STABLE LAYOUT)
-    //   Node id = course KEY. Edges reference keys directly.
+    //  BUILD ELEMENTS FOR A TRACK
     // ═══════════════════════════════════════════════════════
     function getElements(trackId) {
         const track = tracks[trackId];
         const keySet = new Set(track.keys);
 
-        const nodes = track.keys
-            .filter(k => courseByKey[k])
-            .map(k => {
-                const c = courseByKey[k];
-                return {
-                    data: {
-                        id: k,
-                        label: `${c.code}\n${c.abbr}`,
-                        category: c.color,
-                    }
-                };
-            });
+        const nodes = track.keys.filter(k => courseByKey[k]).map(k => {
+            const c = courseByKey[k];
+            return {
+                data: { id: k, label: `${c.code}\n${c.abbr}`, category: c.color, catcolor: categoryColors[c.color] || '#94a3b8' },
+                classes: 'state-' + computeState(k),
+            };
+        });
 
         const edges = DATA.edges
             .filter(e => keySet.has(e.from) && keySet.has(e.to))
-            .map(e => ({
-                data: {
-                    id: `${e.from}__${e.to}`,
-                    source: e.from,
-                    target: e.to,
-                    type: e.type,
-                }
-            }));
+            .map(e => ({ data: { id: `${e.from}__${e.to}`, source: e.from, target: e.to, type: e.type } }));
 
         return [...nodes, ...edges];
     }
 
     // ═══════════════════════════════════════════════════════
-    //  APPLY SEMESTER FILTERS VIA OPACITY (NO LAYOUT JUMP)
+    //  SEMESTER FILTERS (opacity, no layout jump)
     // ═══════════════════════════════════════════════════════
     function applySemesterFilters() {
         if (!cy) return;
-
         cy.batch(() => {
             cy.nodes().forEach(node => {
                 const c = courseByKey[node.id()];
                 if (!c) return;
-                const isMatch = activeFilters.has(`${c.year}-${c.sem}`);
-                if (isMatch) {
-                    node.removeClass('filter-dimmed');
-                } else {
-                    node.addClass('filter-dimmed');
-                }
+                node[activeFilters.has(`${c.year}-${c.sem}`) ? 'removeClass' : 'addClass']('filter-dimmed');
             });
-
             cy.edges().forEach(edge => {
-                const srcDimmed = edge.source().hasClass('filter-dimmed');
-                const tgtDimmed = edge.target().hasClass('filter-dimmed');
-                if (srcDimmed || tgtDimmed) {
-                    edge.addClass('filter-dimmed');
-                } else {
-                    edge.removeClass('filter-dimmed');
-                }
+                const dim = edge.source().hasClass('filter-dimmed') || edge.target().hasClass('filter-dimmed');
+                edge[dim ? 'addClass' : 'removeClass']('filter-dimmed');
             });
         });
 
         const totalNodes = cy.nodes().length;
         const activeNodes = cy.nodes().not('.filter-dimmed').length;
         const track = tracks[currentTrack];
-
-        if (activeNodes === 0) {
-            document.getElementById('graph-subtitle').textContent = 'All courses dimmed (no matching semester selected)';
-        } else if (activeNodes < totalNodes) {
-            document.getElementById('graph-subtitle').textContent = `Highlighting ${activeNodes} of ${totalNodes} courses`;
-        } else {
-            document.getElementById('graph-subtitle').textContent = track.subtitle;
-        }
+        const sub = document.getElementById('graph-subtitle');
+        if (activeNodes === 0) sub.textContent = 'All courses dimmed (no matching semester selected)';
+        else if (activeNodes < totalNodes) sub.textContent = `Highlighting ${activeNodes} of ${totalNodes} courses`;
+        else sub.textContent = track.subtitle;
     }
+
+    // ═══════════════════════════════════════════════════════
+    //  UPDATE NODE VISUALS (state border) + progress rings
+    // ═══════════════════════════════════════════════════════
+    function updateNodeVisuals() {
+        if (!cy) return;
+        cy.batch(() => {
+            cy.nodes().forEach(n => {
+                const k = n.id();
+                n.removeClass('state-done state-progress state-ready state-idle');
+                n.addClass('state-' + computeState(k));
+            });
+        });
+        drawRings();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PROGRESS RINGS  —  a canvas overlay that traces each node's
+    //  rounded-rectangle outline proportional to its completion.
+    // ═══════════════════════════════════════════════════════
+    const overlay = document.getElementById('cy-overlay');
+    const octx = overlay.getContext('2d');
+    let drawScheduled = false;
+
+    function scheduleDraw() {
+        if (drawScheduled) return;
+        drawScheduled = true;
+        requestAnimationFrame(() => { drawScheduled = false; drawRings(); });
+    }
+    function sizeOverlay() {
+        const wrap = overlay.parentElement;
+        const dpr = window.devicePixelRatio || 1;
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        overlay.width = Math.round(w * dpr);
+        overlay.height = Math.round(h * dpr);
+        overlay.style.width = w + 'px';
+        overlay.style.height = h + 'px';
+    }
+    // Build a rounded-rect path that STARTS at top-center and runs clockwise,
+    // so a dashed stroke reveals progress starting from the top. Returns perimeter.
+    function roundRectTopStart(ctx, x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        const cx = x + w / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, y);
+        ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+        ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+        ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+        ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+        ctx.lineTo(cx, y);
+        return 2 * (w - 2 * r) + 2 * (h - 2 * r) + 2 * Math.PI * r;
+    }
+    // Cytoscape's built-in round-rectangle radius = min(w/4, h/4, 8) in MODEL units.
+    const NODE_CORNER_CAP = 8;
+    function drawRings() {
+        if (!cy || !octx) return;
+        const dpr = window.devicePixelRatio || 1;
+        octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        octx.clearRect(0, 0, overlay.width / dpr, overlay.height / dpr);
+        octx.lineCap = 'round';
+        const zoom = cy.zoom();
+        const m = 4;                                   // gap between node border and ring
+        cy.nodes().forEach(n => {
+            const k = n.id();
+            const bb = n.renderedBoundingBox({ includeLabels: false, includeOverlays: false });
+            const bw = bb.x2 - bb.x1, bh = bb.y2 - bb.y1;
+            const x = bb.x1 - m, y = bb.y1 - m, w = bw + 2 * m, h = bh + 2 * m;
+            if (w <= 2 || h <= 2) return;
+            // Match the node's own rendered corner radius, then offset outward by m
+            // so the ring runs exactly parallel to the node's rounded corners.
+            const nodeR = Math.min(bw / 4, bh / 4, NODE_CORNER_CAP * zoom);
+            const r = Math.min(nodeR + m, w / 2, h / 2);
+            const dim = n.hasClass('dimmed') || n.hasClass('filter-dimmed');
+            const a = dim ? 0.10 : 1;
+            const frac = courseFraction(k);
+            const done = frac >= 1;
+
+            // faint background track (the full loop)
+            const P = roundRectTopStart(octx, x, y, w, h, r);
+            octx.setLineDash([]);
+            octx.lineWidth = 3;
+            octx.strokeStyle = `rgba(255,255,255,${0.06 * a})`;
+            octx.stroke();
+
+            // green progress arc (semi-transparent)
+            if (frac > 0) {
+                roundRectTopStart(octx, x, y, w, h, r);
+                octx.lineWidth = 3.5;
+                octx.strokeStyle = `rgba(52,211,153,${(done ? 0.78 : 0.68) * a})`;
+                if (done) octx.setLineDash([]);
+                else { octx.setLineDash([P * frac, P]); octx.lineDashOffset = 0; }
+                octx.stroke();
+                octx.setLineDash([]);
+            }
+        });
+    }
+    window.addEventListener('resize', () => { sizeOverlay(); scheduleDraw(); });
 
     // ═══════════════════════════════════════════════════════
     //  RENDER GRAPH
     // ═══════════════════════════════════════════════════════
     function renderGraph(trackId) {
         if (cy) cy.destroy();
-
         const track = tracks[trackId];
         const elements = getElements(trackId);
 
         cy = cytoscape({
             container: document.getElementById('cy'),
-            elements,
-            style: cyStyle,
-            userZoomingEnabled: true,
-            userPanningEnabled: true,
-            boxSelectionEnabled: false,
-            autoungrabify: true,
-            minZoom: 0.25,
-            maxZoom: 3.5,
-            wheelSensitivity: 0.15,
+            elements, style: cyStyle,
+            userZoomingEnabled: true, userPanningEnabled: true,
+            boxSelectionEnabled: false, autoungrabify: true,
+            minZoom: 0.25, maxZoom: 3.5, wheelSensitivity: 0.15,
         });
 
         if (elements.length > 0) {
-            cy.layout({
-                name: 'dagre',
-                rankDir: 'TB',
-                rankSep: track.rankSep,
-                nodeSep: track.nodeSep,
-                padding: 40,
-                animate: false,
-                fit: true,
-            }).run();
+            cy.layout({ name: 'dagre', rankDir: 'TB', rankSep: track.rankSep, nodeSep: track.nodeSep, padding: 40, animate: false, fit: true }).run();
         }
 
-        // Apply current active semester opacity
+        // Keep the progress-ring overlay in sync with pan / zoom / resize
+        sizeOverlay();
+        cy.on('render', scheduleDraw);
+        cy.on('resize', () => { sizeOverlay(); scheduleDraw(); });
+
         applySemesterFilters();
+        updateNodeVisuals();
+        refreshProgressUI();
 
-        // Debounced Hover Highlighting (waits 250ms before highlighting to avoid rapid flickering)
-        let hoverTimeout = null;
-        let isHoverActive = false;
-
+        // Debounced hover highlighting
+        let hoverTimeout = null, isHoverActive = false;
         function clearHoverHighlight() {
-            if (hoverTimeout) {
-                clearTimeout(hoverTimeout);
-                hoverTimeout = null;
-            }
-            if (isHoverActive) {
-                cy.elements().removeClass('dimmed highlighted connected connected-edge');
-                isHoverActive = false;
-            }
+            if (hoverTimeout) { clearTimeout(hoverTimeout); hoverTimeout = null; }
+            if (isHoverActive) { cy.elements().removeClass('dimmed highlighted connected connected-edge'); isHoverActive = false; }
         }
-
         cy.on('mouseover', 'node', e => {
             const node = e.target;
             if (hoverTimeout) clearTimeout(hoverTimeout);
-
             hoverTimeout = setTimeout(() => {
                 if (!cy) return;
                 const hood = node.closedNeighborhood();
@@ -921,39 +1131,42 @@
                 node.addClass('highlighted');
                 hood.edges().addClass('connected-edge');
                 hood.nodes().not(node).addClass('connected');
-                isHoverActive = true;
-                hoverTimeout = null;
+                isHoverActive = true; hoverTimeout = null;
             }, 250);
         });
+        cy.on('mouseout', 'node', clearHoverHighlight);
+        cy.on('pan zoom', clearHoverHighlight);
 
-        cy.on('mouseout', 'node', () => {
-            clearHoverHighlight();
-        });
-
-        cy.on('pan zoom', () => {
-            clearHoverHighlight();
-        });
-
-        // Click to show info
         cy.on('tap', 'node', e => {
             const nodeId = e.target.id();
-            if (selectedNode === nodeId) {
-                hideInfoPanel();
-            } else {
-                showInfoPanel(nodeId);
-            }
+            if (selectedNode === nodeId) hideInfoPanel(); else showInfoPanel(nodeId);
         });
-
-        // Click background to close
-        cy.on('tap', e => {
-            if (e.target === cy) hideInfoPanel();
-        });
+        cy.on('tap', e => { if (e.target === cy) hideInfoPanel(); });
     }
 
     // ═══════════════════════════════════════════════════════
-    //  INFO PANEL
-    //   `courseKey` is a course KEY (the node id).
+    //  INFO PANEL  (+ learning checklist + progress ring)
     // ═══════════════════════════════════════════════════════
+    function ringSVG(frac) {
+        const pct = Math.round(frac * 100), r = 26, C = 2 * Math.PI * r, off = C * (1 - frac);
+        const col = frac >= 1 ? '#34d399' : (frac > 0 ? '#fbbf24' : '#475569');
+        return `<svg class="ring" width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
+            <circle id="ring-fg" cx="32" cy="32" r="${r}" fill="none" stroke="${col}" stroke-width="6" stroke-linecap="round"
+                stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 32 32)"/>
+            <text id="ring-label" x="32" y="37" text-anchor="middle" font-size="15" font-weight="700" fill="#e2e8f0">${pct}%</text>
+        </svg>`;
+    }
+    function updateRing(frac) {
+        const r = 26, C = 2 * Math.PI * r;
+        const fg = document.getElementById('ring-fg'), lb = document.getElementById('ring-label');
+        if (fg) {
+            fg.setAttribute('stroke-dashoffset', (C * (1 - frac)).toFixed(1));
+            fg.setAttribute('stroke', frac >= 1 ? '#34d399' : (frac > 0 ? '#fbbf24' : '#475569'));
+        }
+        if (lb) lb.textContent = Math.round(frac * 100) + '%';
+    }
+
     function showInfoPanel(courseKey) {
         const course = courseByKey[courseKey];
         if (!course) return;
@@ -961,21 +1174,13 @@
 
         const color = categoryColors[course.color] || '#94a3b8';
         const trackKeys = new Set(tracks[currentTrack].keys);
-
-        // Incoming edges: prerequisites OF this course
-        const prereqs = DATA.edges
-            .filter(e => e.to === courseKey && trackKeys.has(e.from) && courseByKey[e.from])
-            .map(e => ({ key: e.from, ...courseByKey[e.from], edgeType: e.type }));
-
-        // Outgoing edges: courses that NEED this course
-        const dependents = DATA.edges
-            .filter(e => e.from === courseKey && trackKeys.has(e.to) && courseByKey[e.to])
-            .map(e => ({ key: e.to, ...courseByKey[e.to], edgeType: e.type }));
-
+        const prereqs = DATA.edges.filter(e => e.to === courseKey && trackKeys.has(e.from) && courseByKey[e.from]).map(e => ({ key: e.from, ...courseByKey[e.from], edgeType: e.type }));
+        const dependents = DATA.edges.filter(e => e.from === courseKey && trackKeys.has(e.to) && courseByKey[e.to]).map(e => ({ key: e.to, ...courseByKey[e.to], edgeType: e.type }));
         const isCodeValid = /^\d+$/.test(course.code);
-        const panel = document.getElementById('info-inner');
+        const topics = course.topics || [];
+        const frac = courseFraction(courseKey), total = topics.length, learned = courseLearned(courseKey);
 
-        panel.innerHTML = `
+        document.getElementById('info-inner').innerHTML = `
             <div class="info-header">
                 <button class="info-close" onclick="hideInfoPanel()">×</button>
                 <div class="info-code" style="color:${color}">${course.code}</div>
@@ -986,6 +1191,27 @@
                 </div>
             </div>
             ${course.desc ? `<div class="info-desc">${course.desc}</div>` : ''}
+            ${total ? `
+                <div class="info-section">
+                    <div class="checklist-head">
+                        ${ringSVG(frac)}
+                        <div>
+                            <h3>Learning Checklist</h3>
+                            <div class="cl-count" id="cl-count">${learned}/${total} topics learned</div>
+                            <div class="cl-actions">
+                                <button onclick="setAllTopics('${courseKey}', true)">Mark all</button>
+                                <button onclick="setAllTopics('${courseKey}', false)">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                    ${verifySet.has(courseKey) ? `<div class="verify-flag">⚠ Topics seeded from a standard syllabus — verify against the official outline.</div>` : ''}
+                    <div class="topic-list" style="margin-top:8px">
+                        ${topics.map((tp, i) => `
+                            <div class="topic-row ${isLearned(courseKey, tp) ? 'checked' : ''}" data-i="${i}" onclick="toggleTopic('${courseKey}', ${i})">
+                                <span class="topic-check"></span><span class="topic-text">${tp}</span>
+                            </div>`).join('')}
+                    </div>
+                </div>` : ''}
             ${prereqs.length ? `
                 <div class="info-section">
                     <h3>Prerequisites</h3>
@@ -994,10 +1220,8 @@
                             <span class="dep-code">${p.code}</span>
                             <span class="dep-name">${p.abbr}</span>
                             <span class="dep-type ${p.edgeType}">${p.edgeType}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            ` : ''}
+                        </div>`).join('')}
+                </div>` : ''}
             ${dependents.length ? `
                 <div class="info-section">
                     <h3>Leads To</h3>
@@ -1006,17 +1230,11 @@
                             <span class="dep-code">${d.code}</span>
                             <span class="dep-name">${d.abbr}</span>
                             <span class="dep-type ${d.edgeType}">${d.edgeType}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            ` : ''}
+                        </div>`).join('')}
+                </div>` : ''}
             ${isCodeValid ? `
-                <a class="cugetreg-link" href="${DATA.meta.getRegBase}${course.code}" target="_blank" rel="noopener noreferrer">
-                    View on CU Get Reg ↗
-                </a>
-            ` : ''}
+                <a class="cugetreg-link" href="${DATA.meta.getRegBase}${course.code}" target="_blank" rel="noopener noreferrer">View on CU Get Reg ↗</a>` : ''}
         `;
-
         document.getElementById('info-panel').classList.add('visible');
     }
 
@@ -1024,17 +1242,55 @@
         selectedNode = null;
         document.getElementById('info-panel').classList.remove('visible');
     }
-
     function focusNode(nodeKey) {
         const node = cy.$('#' + nodeKey);
-        if (node.length) {
-            cy.animate({ center: { eles: node }, zoom: cy.zoom() }, { duration: 350 });
-            showInfoPanel(nodeKey);
-        }
+        if (node.length) { cy.animate({ center: { eles: node }, zoom: cy.zoom() }, { duration: 350 }); showInfoPanel(nodeKey); }
+    }
+    function resetView() { cy?.fit(50); }
+
+    // ── Checklist interactions ──
+    function toggleTopic(key, i) {
+        const tp = courseByKey[key].topics[i];
+        const cur = isLearned(key, tp);
+        setLearned(key, tp, !cur);
+        const row = document.querySelector(`.topic-row[data-i="${i}"]`);
+        if (row) row.classList.toggle('checked', !cur);
+        const frac = courseFraction(key), total = courseByKey[key].topics.length, learned = courseLearned(key);
+        updateRing(frac);
+        const cc = document.getElementById('cl-count');
+        if (cc) cc.textContent = `${learned}/${total} topics learned`;
+        updateNodeVisuals();
+        refreshProgressUI();
+    }
+    function setAllTopics(key, val) {
+        (courseByKey[key].topics || []).forEach(tp => setLearned(key, tp, val));
+        showInfoPanel(key);
+        updateNodeVisuals();
+        refreshProgressUI();
     }
 
-    function resetView() {
-        cy?.fit(50);
+    // ═══════════════════════════════════════════════════════
+    //  HEADER PROGRESS SUMMARY
+    // ═══════════════════════════════════════════════════════
+    function refreshProgressUI() {
+        const all = dagCourseKeys();
+        let learned = 0, total = 0, doneCount = 0;
+        all.forEach(k => {
+            const t = courseByKey[k].topics || [];
+            total += t.length; learned += t.filter(tp => isLearned(k, tp)).length;
+            if (courseDone(k)) doneCount++;
+        });
+        const pct = total ? Math.round(learned / total * 100) : 0;
+
+        const tkeys = tracks[currentTrack].keys.filter(k => courseByKey[k] && courseByKey[k].dag);
+        let tl = 0, tt = 0;
+        tkeys.forEach(k => { const t = courseByKey[k].topics || []; tt += t.length; tl += t.filter(tp => isLearned(k, tp)).length; });
+        const tpct = tt ? Math.round(tl / tt * 100) : 0;
+
+        document.getElementById('ps-fill').style.width = pct + '%';
+        const viewLabel = currentTrack === 'complete' ? 'this view' : tracks[currentTrack].label.replace(/^\S+\s/, '');
+        document.getElementById('ps-text').innerHTML =
+            `<b>${pct}%</b> overall · ${doneCount}/${all.length} courses complete · ${viewLabel} <b>${tpct}%</b>`;
     }
 
     // ═══════════════════════════════════════════════════════
@@ -1044,16 +1300,9 @@
         if (trackId === currentTrack) return;
         currentTrack = trackId;
         hideInfoPanel();
-
-        document.querySelectorAll('.tab').forEach(t => {
-            t.classList.toggle('active', t.dataset.track === trackId);
-        });
-
-        // Small delay so panel closes before graph re-renders
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.track === trackId));
         setTimeout(() => renderGraph(trackId), 50);
     }
-
-    // Build tabs from data
     const tabBar = document.getElementById('tab-bar');
     trackOrder.forEach((id, i) => {
         const btn = document.createElement('button');
@@ -1068,63 +1317,62 @@
     //  SEMESTER FILTERING
     // ═══════════════════════════════════════════════════════
     const semButtons = document.querySelectorAll('.filter-btn[data-year]');
-
     function updateActiveFilterUI() {
-        semButtons.forEach(btn => {
-            const key = `${btn.dataset.year}-${btn.dataset.sem}`;
-            btn.classList.toggle('active', activeFilters.has(key));
-        });
+        semButtons.forEach(btn => btn.classList.toggle('active', activeFilters.has(`${btn.dataset.year}-${btn.dataset.sem}`)));
     }
-
-    semButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const key = `${btn.dataset.year}-${btn.dataset.sem}`;
-            if (activeFilters.has(key)) {
-                activeFilters.delete(key);
-            } else {
-                activeFilters.add(key);
-            }
-            updateActiveFilterUI();
-            applySemesterFilters();
-        });
-    });
-
-    // Toggle entire year
-    document.querySelectorAll('.filter-year-btn').forEach(yBtn => {
-        yBtn.addEventListener('click', () => {
-            const y = yBtn.dataset.year;
-            const k1 = `${y}-1`;
-            const k2 = `${y}-2`;
-            const bothActive = activeFilters.has(k1) && activeFilters.has(k2);
-
-            if (bothActive) {
-                activeFilters.delete(k1);
-                activeFilters.delete(k2);
-            } else {
-                activeFilters.add(k1);
-                activeFilters.add(k2);
-            }
-            updateActiveFilterUI();
-            applySemesterFilters();
-        });
-    });
-
-    // Quick All / Clear
+    semButtons.forEach(btn => btn.addEventListener('click', () => {
+        const key = `${btn.dataset.year}-${btn.dataset.sem}`;
+        activeFilters.has(key) ? activeFilters.delete(key) : activeFilters.add(key);
+        updateActiveFilterUI(); applySemesterFilters();
+    }));
+    document.querySelectorAll('.filter-year-btn').forEach(yBtn => yBtn.addEventListener('click', () => {
+        const y = yBtn.dataset.year, k1 = `${y}-1`, k2 = `${y}-2`;
+        const both = activeFilters.has(k1) && activeFilters.has(k2);
+        if (both) { activeFilters.delete(k1); activeFilters.delete(k2); } else { activeFilters.add(k1); activeFilters.add(k2); }
+        updateActiveFilterUI(); applySemesterFilters();
+    }));
     document.getElementById('filter-all')?.addEventListener('click', () => {
         ['1-1','1-2','2-1','2-2','3-1','3-2','4-1','4-2'].forEach(k => activeFilters.add(k));
-        updateActiveFilterUI();
-        applySemesterFilters();
+        updateActiveFilterUI(); applySemesterFilters();
     });
-
     document.getElementById('filter-none')?.addEventListener('click', () => {
-        activeFilters.clear();
-        updateActiveFilterUI();
-        applySemesterFilters();
+        activeFilters.clear(); updateActiveFilterUI(); applySemesterFilters();
     });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hideInfoPanel(); });
 
-    // Escape key closes panel
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') hideInfoPanel();
+    // ═══════════════════════════════════════════════════════
+    //  EXPORT / IMPORT / RESET
+    // ═══════════════════════════════════════════════════════
+    document.getElementById('ps-export').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(progress, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'cp-roadmap-progress.json';
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(a.href);
+    });
+    document.getElementById('ps-import').addEventListener('change', e => {
+        const f = e.target.files[0]; if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => {
+            try {
+                const data = JSON.parse(rd.result);
+                if (data && typeof data === 'object') {
+                    progress = data; saveProgress();
+                    updateNodeVisuals(); refreshProgressUI();
+                    if (selectedNode) showInfoPanel(selectedNode);
+                }
+            } catch (err) { alert('Could not read that progress file.'); }
+            e.target.value = '';
+        };
+        rd.readAsText(f);
+    });
+    document.getElementById('ps-reset').addEventListener('click', () => {
+        if (confirm('Clear all learning progress? This cannot be undone.')) {
+            progress = {}; saveProgress();
+            updateNodeVisuals(); refreshProgressUI();
+            if (selectedNode) showInfoPanel(selectedNode);
+        }
     });
 
     // ═══════════════════════════════════════════════════════
