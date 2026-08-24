@@ -33,7 +33,42 @@
         }
 
         /* ── Header ── */
-        .header { text-align: center; flex-shrink: 0; }
+        .header { text-align: center; flex-shrink: 0; position: relative; }
+
+        /* ── View switcher (cross-link to the other page) ── */
+        .view-switch {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(96,165,250,0.08);
+            border: 1px solid rgba(96,165,250,0.18);
+            border-radius: 8px;
+            color: #93c5fd;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .view-switch:hover {
+            background: rgba(96,165,250,0.16);
+            border-color: rgba(96,165,250,0.35);
+            color: #dbeafe;
+        }
+
+        .view-switch .vs-icon { font-size: 0.9rem; line-height: 1; }
+
+        @media (max-width: 640px) {
+            .view-switch .vs-text { display: none; }
+            .view-switch { padding: 6px 9px; }
+        }
 
         .header h1 {
             font-size: 1.35rem;
@@ -502,6 +537,9 @@
         <header class="header">
             <h1>Computer Engineering Roadmap</h1>
             <p class="subtitle" id="subtitle"></p>
+            <a class="view-switch" href="semester_courses.html" title="Switch to the semester grid view">
+                <span class="vs-icon">▦</span><span class="vs-text">Semester Grid</span>
+            </a>
         </header>
 
         <div class="legend-bar" id="legend-bar"></div>

@@ -8,9 +8,13 @@
     <script src="curriculum.js"></script>
     <style>
         :root {
-            --bg-color: #f4f7f6;
-            --year-bg: #e9ecef;
-            
+            --bg-color: #0d1117;
+            --year-bg: rgba(255,255,255,0.03);
+            --panel-bg: rgba(255,255,255,0.04);
+            --panel-border: rgba(255,255,255,0.07);
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+
             /* Exact colors sampled from the image */
             --c-light-green: #97bc7c;
             --c-blue: #7297c1;
@@ -31,6 +35,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
+            background-image: linear-gradient(145deg, #0a0a14 0%, #12122a 35%, #0f1b2d 70%, #0a1628 100%);
+            color: var(--text-main);
             margin: 0;
             padding: 1vh 1vw;
             height: 100vh;
@@ -40,12 +46,52 @@
             overflow: hidden;
         }
 
+        .page-header {
+            position: relative;
+            flex-shrink: 0;
+        }
+
         h1 {
             text-align: center;
             margin: 0 0 10px 0;
             font-size: 1.4rem;
-            color: #333;
+            color: var(--text-main);
             flex-shrink: 0;
+        }
+
+        /* ── View switcher (cross-link to the other page) ── */
+        .view-switch {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(96,165,250,0.10);
+            border: 1px solid rgba(96,165,250,0.22);
+            border-radius: 8px;
+            color: #93c5fd;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .view-switch:hover {
+            background: rgba(96,165,250,0.20);
+            border-color: rgba(96,165,250,0.4);
+            color: #dbeafe;
+        }
+
+        .view-switch .vs-icon { font-size: 0.95rem; line-height: 1; }
+
+        @media (max-width: 640px) {
+            .view-switch .vs-text { display: none; }
+            .view-switch { padding: 6px 9px; }
         }
 
         /* Legend Styling */
@@ -56,9 +102,10 @@
             justify-content: center;
             margin-bottom: 10px;
             padding: 8px 15px;
-            background: #fff;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             flex-shrink: 0;
         }
 
@@ -67,7 +114,7 @@
             align-items: center;
             gap: 6px;
             font-size: 0.75rem;
-            color: #333;
+            color: var(--text-dim);
             font-weight: 500;
         }
 
@@ -93,6 +140,7 @@
 
         .year-column {
             background-color: var(--year-bg);
+            border: 1px solid var(--panel-border);
             border-radius: 8px;
             padding: 8px;
             flex: 1;
@@ -105,10 +153,11 @@
             text-align: center;
             font-size: 1rem;
             font-weight: bold;
+            color: var(--text-main);
             margin-top: 0;
             margin-bottom: 8px;
             padding-bottom: 6px;
-            border-bottom: 2px solid #d1d5db;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
         }
 
@@ -130,7 +179,7 @@
             font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 6px;
-            color: #666;
+            color: var(--text-dim);
             text-align: center;
             flex-shrink: 0;
         }
@@ -230,7 +279,12 @@
 </head>
 <body>
 
-    <h1 id="page-title"></h1>
+    <div class="page-header">
+        <h1 id="page-title"></h1>
+        <a class="view-switch" href="dag_roadmap.html" title="Switch to the prerequisite graph view">
+            <span class="vs-icon">⋔</span><span class="vs-text">Prerequisite Map</span>
+        </a>
+    </div>
     <div id="legend" class="legend-container"></div>
     <div id="roadmap" class="roadmap-container"></div>
 
