@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Engineering DAG: CU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #0a0a14 0%, #12122a 35%, #0f1b2d 70%, #0a1628 100%);
+            color: #e2e8f0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 12px 18px 8px;
+            gap: 8px;
+        }
+
+        /* ── Header ── */
+        .header { text-align: center; flex-shrink: 0; }
+
+        .header h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 45%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            font-size: 0.72rem;
+            color: #475569;
+            margin-top: 2px;
+        }
+
+        /* ── Legend ── */
+        .legend-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            padding: 7px 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.68rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 3px;
+        }
+
+        /* ── Tabs ── */
+        .tab-bar {
+            display: flex;
+            gap: 3px;
+            padding: 3px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 7px 10px;
+            border: none;
+            background: transparent;
+            color: #4b5563;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 500;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover { background: rgba(255,255,255,0.035); color: #94a3b8; }
+
+        .tab.active {
+            background: rgba(255,255,255,0.07);
+            color: #f1f5f9;
+            font-weight: 600;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+        }
+
+        /* ── Main ── */
+        .main-content {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            min-height: 0;
+            position: relative;
+        }
+
+        .graph-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .graph-subtitle {
+            font-size: 0.72rem;
+            color: #3f4f63;
+            text-align: center;
+            flex-shrink: 0;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+
+        .cy-wrapper {
+            flex: 1;
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.012);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        #cy { width: 100%; height: 100%; }
+
+        .reset-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(10,10,20,0.75);
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        .reset-btn:hover {
+            background: rgba(20,20,40,0.9);
+            color: #e2e8f0;
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        /* ── Info Panel ── */
+        .info-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 290px;
+            height: 100%;
+            z-index: 20;
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .info-panel.visible {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .info-inner {
+            width: 290px;
+            height: 100%;
+            padding: 18px;
+            background: #13132a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-inner::-webkit-scrollbar { width: 3px; }
+        .info-inner::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+        .info-header { position: relative; }
+
+        .info-close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: rgba(255,255,255,0.04);
+            color: #64748b;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .info-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+        .info-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .info-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-top: 3px;
+        }
+
+        .info-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .badge {
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .badge.outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #94a3b8;
+        }
+
+        .info-desc {
+            font-size: 0.76rem;
+            color: #7c8a9a;
+            line-height: 1.55;
+        }
+
+        .info-section h3 {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #4b5563;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .dep-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 5px;
+            margin-bottom: 3px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dep-item:hover { background: rgba(255,255,255,0.05); }
+
+        .dep-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .dep-name { font-size: 0.68rem; color: #64748b; }
+
+        .dep-type {
+            margin-left: auto;
+            font-size: 0.55rem;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .dep-type.prereq { background: rgba(167,139,250,0.15); color: #a78bfa; }
+        .dep-type.recommended { background: rgba(96,165,250,0.12); color: #60a5fa; }
+        .dep-type.coreq { background: rgba(148,163,184,0.1); color: #94a3b8; }
+
+        .cugetreg-link {
+            display: block;
+            margin-top: 2px;
+            padding: 7px 14px;
+            background: rgba(96,165,250,0.08);
+            border: 1px solid rgba(96,165,250,0.15);
+            border-radius: 7px;
+            color: #60a5fa;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .cugetreg-link:hover {
+            background: rgba(96,165,250,0.15);
+            border-color: rgba(96,165,250,0.3);
+        }
+
+        /* ── Edge Legend ── */
+        .edge-legend {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            padding: 6px;
+            flex-shrink: 0;
+        }
+
+        .edge-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.67rem;
+            color: #4b5563;
+        }
+
+        .el-line {
+            width: 24px;
+            height: 0;
+            border-top: 2.5px solid rgba(255,255,255,0.4);
+        }
+
+        .el-line.dashed { border-top-style: dashed; border-color: rgba(255,255,255,0.2); }
+        .el-line.dotted { border-top-style: dotted; border-color: rgba(148,163,184,0.35); }
+
+        .el-arrow {
+            width: 0;
+            height: 0;
+            border-left: 5px solid rgba(255,255,255,0.4);
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+        }
+
+        .el-arrow.dashed { border-left-color: rgba(255,255,255,0.2); }
+        .el-arrow.dotted { border-left-color: rgba(148,163,184,0.35); }
+
+        /* ── Semester Filters ── */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .filter-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            margin-right: 2px;
+            flex-shrink: 0;
+        }
+
+        .filter-quick {
+            display: flex;
+            gap: 3px;
+        }
+
+        .filter-quick-btn {
+            padding: 3px 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-quick-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #f1f5f9;
+        }
+
+        .filter-divider {
+            width: 1px;
+            height: 16px;
+            background: rgba(255,255,255,0.08);
+            margin: 0 4px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+            background: rgba(255,255,255,0.015);
+            padding: 2px 4px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .filter-year-btn {
+            padding: 3px 7px;
+            border: none;
+            background: transparent;
+            color: #a78bfa;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-year-btn:hover {
+            background: rgba(167,139,250,0.15);
+            color: #c4b5fd;
+        }
+
+        .filter-btn {
+            padding: 3px 8px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            color: #475569;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.66rem;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: #cbd5e1;
+        }
+
+        .filter-btn.active {
+            background: rgba(96,165,250,0.14);
+            border-color: rgba(96,165,250,0.3);
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        /* ── Standalone Note ── */
+        .standalone-note {
+            font-size: 0.65rem;
+            color: #374151;
+            text-align: center;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .standalone-note span { color: #64748b; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>Computer Engineering Roadmap</h1>
+            <p class="subtitle">Chulalongkorn University · B.Eng. Computer Engineering · Curriculum 2024</p>
+        </header>
+
+        <div class="legend-bar" id="legend-bar"></div>
+
+        <nav class="tab-bar" id="tab-bar">
+            <button class="tab active" data-track="complete">🔗 Complete Map</button>
+            <button class="tab" data-track="software">💻 Software & Algorithms</button>
+            <button class="tab" data-track="hardware">⚡ Hardware & Architecture</button>
+            <button class="tab" data-track="math">📐 Math & Science</button>
+            <button class="tab" data-track="language">📝 Language</button>
+        </nav>
+
+        <div class="filter-bar" id="filter-bar">
+            <span class="filter-label">Filter Semesters:</span>
+            <div class="filter-quick">
+                <button class="filter-quick-btn" id="filter-all" title="Select all semesters">All</button>
+                <button class="filter-quick-btn" id="filter-none" title="Deselect all semesters">Clear</button>
+            </div>
+            <div class="filter-divider"></div>
+            <div class="filter-group">
+                <button class="filter-year-btn" data-year="1" title="Toggle entire Year 1">Year 1</button>
+                <button class="filter-btn active" data-year="1" data-sem="1" title="Year 1 Semester 1">Y1 S1</button>
+                <button class="filter-btn active" data-year="1" data-sem="2" title="Year 1 Semester 2">Y1 S2</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-year-btn" data-year="2" title="Toggle entire Year 2">Year 2</button>
+                <button class="filter-btn active" data-year="2" data-sem="1" title="Year 2 Semester 1">Y2 S1</button>
+                <button class="filter-btn active" data-year="2" data-sem="2" title="Year 2 Semester 2">Y2 S2</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-year-btn" data-year="3" title="Toggle entire Year 3">Year 3</button>
+                <button class="filter-btn active" data-year="3" data-sem="1" title="Year 3 Semester 1">Y3 S1</button>
+                <button class="filter-btn active" data-year="3" data-sem="2" title="Year 3 Semester 2">Y3 S2</button>
+            </div>
+            <div class="filter-group">
+                <button class="filter-year-btn" data-year="4" title="Toggle entire Year 4">Year 4</button>
+                <button class="filter-btn active" data-year="4" data-sem="1" title="Year 4 Semester 1">Y4 S1</button>
+                <button class="filter-btn active" data-year="4" data-sem="2" title="Year 4 Semester 2">Y4 S2</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="graph-area">
+                <div class="graph-subtitle" id="graph-subtitle"></div>
+                <div class="cy-wrapper">
+                    <div id="cy"></div>
+                    <button class="reset-btn" onclick="resetView()" title="Fit graph to viewport">⊡</button>
+                </div>
+            </div>
+            <div class="info-panel" id="info-panel">
+                <div class="info-inner" id="info-inner">
+                    <div style="text-align:center;padding:50px 10px;color:#374151">
+                        <div style="font-size:1.8rem;margin-bottom:10px;opacity:0.5">🔍</div>
+                        <div style="font-size:0.8rem">Click any course node<br>to view details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="edge-legend">
+            <div class="edge-legend-item"><div class="el-line"></div><div class="el-arrow"></div><span>Required Prerequisite</span></div>
+            <div class="edge-legend-item"><div class="el-line dashed"></div><div class="el-arrow dashed"></div><span>Recommended Flow</span></div>
+            <div class="edge-legend-item"><div class="el-line dotted"></div><div class="el-arrow dotted"></div><span>Corequisite (Taken Together)</span></div>
+        </div>
+
+        <div class="standalone-note">
+            <span>Not shown:</span> 2100111 Exploring Engineering World · 2100301 Engineering Practice (Junior Standing) · General Ed · Electives · Free Electives · 21st Century Skills
+        </div>
+    </div>
+
+    <script>
+    // ═══════════════════════════════════════════════════════
+    //  COURSE DATA
+    // ═══════════════════════════════════════════════════════
+    const courses = {
+        // ── Year 1 Semester 1 ──
+        '2110101': { name: 'Computer Programming', abbr: 'COMP PROG', credits: 3, category: 'bg-purple', year: 1, sem: 1,
+            desc: 'Programming fundamentals with Python and C/C++: data types, control flow, functions, and basic OOP.' },
+        '2301107': { name: 'Calculus I', abbr: 'CALCULUS I', credits: 3, category: 'bg-blue', year: 1, sem: 1,
+            desc: 'Limits, continuity, differentiation, integration, and applications of algebraic and transcendental functions.' },
+        '2304103': { name: 'General Physics I', abbr: 'GEN PHYS I', credits: 3, category: 'bg-blue', year: 1, sem: 1,
+            desc: 'Classical mechanics, Newton\'s laws, energy, momentum, rotation, fluid mechanics, and thermodynamics.' },
+        '2304183': { name: 'General Physics Lab I', abbr: 'PHYS LAB I', credits: 1, category: 'bg-blue', year: 1, sem: 1,
+            desc: 'Experiments in mechanics, fluid dynamics, oscillations, sound, and thermal properties.' },
+        '5500111': { name: 'Experiential English I', abbr: 'EXP ENG I', credits: 3, category: 'bg-olive', year: 1, sem: 1,
+            desc: 'Integrated English skills: reading comprehension, vocabulary, paragraph writing, listening, and speaking.' },
+
+        // ── Year 1 Semester 2 ──
+        '2110215': { name: 'Programming Methodology I', abbr: 'PROG METH I', credits: 3, category: 'bg-purple', year: 1, sem: 2,
+            desc: 'OOP principles: classes, inheritance, polymorphism, interfaces, exception handling, and design patterns (Java/C++).' },
+        '2110221': { name: 'Computer Engineering Essentials', abbr: 'COM ENG ESS', credits: 3, category: 'bg-pink', year: 1, sem: 2,
+            desc: 'Overview of hardware, software, algorithms, networks, AI, embedded systems, and cybersecurity.' },
+        '2301108': { name: 'Calculus II', abbr: 'CALCULUS II', credits: 3, category: 'bg-blue', year: 1, sem: 2,
+            desc: 'Sequences, series, Taylor expansion, vectors in 3D, multivariable calculus, and intro to differential equations.' },
+        '2304104': { name: 'General Physics II', abbr: 'GEN PHYS II', credits: 3, category: 'bg-blue', year: 1, sem: 2,
+            desc: 'Electrostatics, electric circuits, electromagnetism, waves, optics, and modern physics.' },
+        '2304184': { name: 'General Physics Lab II', abbr: 'PHYS LAB II', credits: 1, category: 'bg-blue', year: 1, sem: 2,
+            desc: 'Lab experiments in circuits, semiconductors, lenses, diffraction, polarization, and electromagnetic induction.' },
+        '2302127': { name: 'General Chemistry', abbr: 'GEN CHEM', credits: 3, category: 'bg-blue', year: 1, sem: 2,
+            desc: 'Stoichiometry, atomic theory, states of matter, equilibrium, kinetics, bonding, and periodic trends.' },
+        '2302163': { name: 'General Chemistry Lab', abbr: 'CHEM LAB', credits: 1, category: 'bg-blue', year: 1, sem: 2,
+            desc: 'Qualitative analysis, gas diffusion, crystal structures, equilibrium, acid-base titrations, and pH measurement.' },
+        '5500112': { name: 'Experiential English II', abbr: 'EXP ENG II', credits: 3, category: 'bg-olive', year: 1, sem: 2,
+            desc: 'Advanced English skills: synthesizing information, structured presentations, and analytical writing.' },
+
+        // ── Year 2 Semester 1 ──
+        '2110200': { name: 'Discrete Structures', abbr: 'DISCRETE', credits: 3, category: 'bg-purple', year: 2, sem: 1,
+            desc: 'Sets, relations, proofs, combinatorics, recurrence relations, graph theory, trees, and number theory.' },
+        '2110211': { name: 'Intro to Data Structures', abbr: 'DATA STRUCT', credits: 3, category: 'bg-teal', year: 2, sem: 1,
+            desc: 'Arrays, stacks, queues, linked lists, trees (BST, AVL, B-tree), sorting algorithms, and hash tables.' },
+        '2603284': { name: 'Statistics for Physical Science', abbr: 'STATISTICS', credits: 3, category: 'bg-blue', year: 2, sem: 1,
+            desc: 'Probability theory, random variables, distributions, statistical inference, ANOVA, and regression.' },
+        '2110251': { name: 'Digital Computer Logic', abbr: 'DIG LOGIC', credits: 3, category: 'bg-teal', year: 2, sem: 1,
+            desc: 'Boolean algebra, logic gates, Karnaugh maps, combinational and sequential logic, flip-flops, and counters.' },
+        '2110263': { name: 'Digital Logic Lab I', abbr: 'DIG LOGIC LAB', credits: 1, category: 'bg-teal', year: 2, sem: 1,
+            desc: 'Hands-on with digital logic ICs, breadboards, combinational circuits, flip-flops, and state machines.' },
+
+        // ── Year 2 Semester 2 ──
+        '2110201': { name: 'Comp Engineering Math I', abbr: 'CE MATH I', credits: 3, category: 'bg-teal', year: 2, sem: 2,
+            desc: 'Linear algebra: matrices, eigenvalues/eigenvectors, SVD, vector spaces, and orthogonality.' },
+        '2110327': { name: 'Algorithm Design', abbr: 'ALGO DESIGN', credits: 3, category: 'bg-purple', year: 2, sem: 2,
+            desc: 'Complexity analysis, divide & conquer, greedy, dynamic programming, graph algorithms, and NP-completeness.' },
+        '2110322': { name: 'Database Systems', abbr: 'DB SYS', credits: 3, category: 'bg-teal', year: 2, sem: 2,
+            desc: 'Relational model, SQL, ER modeling, normalization (1NF–BCNF), transactions, and B+ tree indexing.' },
+        '2110313': { name: 'Operating Systems', abbr: 'OS', credits: 3, category: 'bg-red', year: 2, sem: 2,
+            desc: 'Processes, threads, scheduling, synchronization, deadlocks, memory management, and file systems.' },
+        '2110352': { name: 'Computer System Architecture', abbr: 'COM SYS ARCH', credits: 3, category: 'bg-teal', year: 2, sem: 2,
+            desc: 'ISA (RISC-V), datapath design, pipelining, cache architecture, virtual memory, and multiprocessor systems.' },
+        '2110363': { name: 'Hardware Synthesis Lab I', abbr: 'HW SYN LAB', credits: 1, category: 'bg-teal', year: 2, sem: 2,
+            desc: 'Verilog/VHDL on FPGA: simulation, synthesis of pipelined CPU components and peripheral interfaces.' },
+        '5500208': { name: 'Communication & Presentation Skills', abbr: 'COM PRES', credits: 3, category: 'bg-olive', year: 2, sem: 2,
+            desc: 'Professional English presentations, technical pitching, visual aid design, and workplace discourse.' },
+
+        // ── Year 3 Semester 1 ──
+        '2110203': { name: 'Comp Engineering Math II', abbr: 'CE MATH II', credits: 3, category: 'bg-teal', year: 3, sem: 1,
+            desc: 'Optimization, linear/integer programming, stochastic processes, estimation, and hypothesis testing.' },
+        '2110423': { name: 'Software Engineering', abbr: 'SOFTWARE ENG', credits: 3, category: 'bg-teal', year: 3, sem: 1,
+            desc: 'Software design tools, modular design, testing, reliability models, cost estimation, and maintenance.' },
+        '2110318': { name: 'Distributed Systems Essentials', abbr: 'DIS SYS', credits: 1, category: 'bg-red', year: 3, sem: 1,
+            desc: 'Client-server, message passing, clock sync, distributed transactions, replication, and web services.' },
+        '2110471': { name: 'Computer Networks', abbr: 'COMP NET', credits: 3, category: 'bg-red', year: 3, sem: 1,
+            desc: 'Network architectures, protocols, LAN/WAN, client-server/P2P, security, and wireless computing.' },
+        '2110366': { name: 'Embedded System Lab', abbr: 'EMBEDDED LAB', credits: 1, category: 'bg-teal', year: 3, sem: 1,
+            desc: 'Firmware on microcontrollers, interfacing buses, sensors, actuators, serial/Wi-Fi communication.' },
+
+        // ── Year 3 Semester 2 ──
+        '5500308': { name: 'Technical Writing for Engineering', abbr: 'TECH WRIT', credits: 3, category: 'bg-olive', year: 3, sem: 2,
+            desc: 'Technical essays, engineering reports, research writing, and experimental result documentation.' },
+
+        // ── Year 4 ──
+        '2110488': { name: 'Capstone Project I', abbr: 'CAP PROJ I', credits: 1, category: 'bg-purple', year: 4, sem: 1,
+            desc: 'Problem definition, project proposal, system design, architectural modeling, and initial implementation.' },
+        '2110489': { name: 'Capstone Project II', abbr: 'CAP PROJ II', credits: 3, category: 'bg-purple', year: 4, sem: 2,
+            desc: 'Full implementation, testing, evaluation, final thesis report, and project defense/presentation.' },
+    };
+
+    // ═══════════════════════════════════════════════════════
+    //  PREREQUISITE EDGES
+    // ═══════════════════════════════════════════════════════
+    const allEdges = [
+        // ── Hard Prerequisites ──
+        { from: '2110101', to: '2110215', type: 'prereq' },
+        { from: '2110101', to: '2110211', type: 'prereq' },
+        { from: '2110211', to: '2110327', type: 'prereq' },
+        { from: '2110200', to: '2110327', type: 'prereq' },
+        { from: '2110211', to: '2110322', type: 'prereq' },
+        { from: '2110211', to: '2110313', type: 'prereq' },
+        { from: '2110221', to: '2110313', type: 'prereq' },
+        { from: '2110313', to: '2110318', type: 'prereq' },
+        { from: '2110221', to: '2110471', type: 'prereq' },
+        { from: '2110251', to: '2110352', type: 'prereq' },
+        { from: '2110263', to: '2110363', type: 'prereq' },
+        { from: '2110263', to: '2110366', type: 'prereq' },
+        { from: '2301107', to: '2301108', type: 'prereq' },
+        { from: '5500111', to: '5500112', type: 'prereq' },
+        { from: '5500112', to: '5500208', type: 'prereq' },
+        { from: '5500208', to: '5500308', type: 'prereq' },
+        { from: '2110488', to: '2110489', type: 'prereq' },
+
+        // ── Recommended / Curriculum Flow ──
+        { from: '2301108', to: '2110201', type: 'recommended' },
+        { from: '2301108', to: '2603284', type: 'recommended' },
+        { from: '2304103', to: '2304104', type: 'recommended' },
+        { from: '2304183', to: '2304184', type: 'recommended' },
+        { from: '2110101', to: '2110200', type: 'recommended' },
+        { from: '2110201', to: '2110203', type: 'recommended' },
+        { from: '2110215', to: '2110423', type: 'recommended' },
+
+        // ── Corequisites ──
+        { from: '2110251', to: '2110263', type: 'coreq' },
+        { from: '2110352', to: '2110363', type: 'coreq' },
+        { from: '2304103', to: '2304183', type: 'coreq' },
+        { from: '2304104', to: '2304184', type: 'coreq' },
+        { from: '2302127', to: '2302163', type: 'coreq' },
+    ];
+
+    // ═══════════════════════════════════════════════════════
+    //  COLORS & LABELS
+    // ═══════════════════════════════════════════════════════
+    const categoryColors = {
+        'bg-purple': '#a78bfa',
+        'bg-teal':   '#2dd4bf',
+        'bg-blue':   '#60a5fa',
+        'bg-pink':   '#f472b6',
+        'bg-red':    '#fb7185',
+        'bg-olive':  '#bef264',
+    };
+
+    const categoryBorders = {
+        'bg-purple': '#8b5cf6',
+        'bg-teal':   '#14b8a6',
+        'bg-blue':   '#3b82f6',
+        'bg-pink':   '#ec4899',
+        'bg-red':    '#f43f5e',
+        'bg-olive':  '#a3e635',
+    };
+
+    const categoryLabels = {
+        'bg-purple': 'Core · Theory & Algorithms',
+        'bg-teal':   'Core · Systems & Applied',
+        'bg-blue':   'Math & Science Foundation',
+        'bg-pink':   'Engineering Foundation',
+        'bg-red':    'Information Technology',
+        'bg-olive':  'Language & Communication',
+    };
+
+    // ═══════════════════════════════════════════════════════
+    //  TRACK DEFINITIONS
+    // ═══════════════════════════════════════════════════════
+    const tracks = {
+        complete: {
+            subtitle: 'All courses with prerequisite, recommended, and corequisite relationships across the 4-year curriculum',
+            courses: Object.keys(courses),
+            rankSep: 65, nodeSep: 35,
+        },
+        software: {
+            subtitle: 'Programming → Data Structures → Algorithms, Databases, OS, Networking, Distributed Systems, and Software Engineering',
+            courses: ['2110101','2110215','2110200','2110211','2110327','2110322','2110313','2110318','2110221','2110471','2110423','2110488','2110489'],
+            rankSep: 80, nodeSep: 45,
+        },
+        hardware: {
+            subtitle: 'Digital logic design → Computer architecture, FPGA synthesis, and embedded systems',
+            courses: ['2110251','2110263','2110352','2110363','2110366'],
+            rankSep: 100, nodeSep: 60,
+        },
+        math: {
+            subtitle: 'Calculus, physics, chemistry, statistics, and computer engineering mathematics',
+            courses: ['2301107','2301108','2304103','2304104','2304183','2304184','2302127','2302163','2603284','2110201','2110203'],
+            rankSep: 75, nodeSep: 40,
+        },
+        language: {
+            subtitle: 'English language skills from experiential learning to technical engineering writing',
+            courses: ['5500111','5500112','5500208','5500308'],
+            rankSep: 100, nodeSep: 60,
+        },
+    };
+
+    // ═══════════════════════════════════════════════════════
+    //  CYTOSCAPE STYLE
+    // ═══════════════════════════════════════════════════════
+    const cyStyle = [
+        {
+            selector: 'node',
+            style: {
+                'label': 'data(label)',
+                'text-wrap': 'wrap',
+                'text-valign': 'center',
+                'text-halign': 'center',
+                'font-family': '"Inter", sans-serif',
+                'font-size': '10.5px',
+                'font-weight': '600',
+                'color': '#fff',
+                'text-outline-width': 0,
+                'shape': 'roundrectangle',
+                'width': 'label',
+                'height': 'label',
+                'padding': '12px',
+                'text-max-width': '120px',
+                'border-width': 2,
+                'background-opacity': 0.92,
+                'transition-property': 'opacity, border-width, border-color',
+                'transition-duration': '0.2s',
+            }
+        },
+        // Category-specific node colors
+        ...Object.entries(categoryColors).map(([cat, color]) => ({
+            selector: `node[category = "${cat}"]`,
+            style: {
+                'background-color': color,
+                'border-color': categoryBorders[cat] || color,
+            }
+        })),
+        // Base edge style
+        {
+            selector: 'edge',
+            style: {
+                'curve-style': 'bezier',
+                'target-arrow-shape': 'triangle',
+                'target-arrow-color': 'rgba(255,255,255,0.45)',
+                'line-color': 'rgba(255,255,255,0.35)',
+                'width': 2,
+                'arrow-scale': 1.1,
+                'transition-property': 'opacity, line-color, width',
+                'transition-duration': '0.2s',
+            }
+        },
+        {
+            selector: 'edge[type = "prereq"]',
+            style: {
+                'line-style': 'solid',
+                'line-color': 'rgba(255,255,255,0.45)',
+                'target-arrow-color': 'rgba(255,255,255,0.45)',
+                'width': 2.5,
+            }
+        },
+        {
+            selector: 'edge[type = "recommended"]',
+            style: {
+                'line-style': 'dashed',
+                'line-color': 'rgba(255,255,255,0.18)',
+                'target-arrow-color': 'rgba(255,255,255,0.18)',
+                'width': 1.5,
+            }
+        },
+        {
+            selector: 'edge[type = "coreq"]',
+            style: {
+                'line-style': 'dotted',
+                'line-color': 'rgba(148,163,184,0.3)',
+                'target-arrow-shape': 'diamond',
+                'target-arrow-color': 'rgba(148,163,184,0.3)',
+                'source-arrow-shape': 'diamond',
+                'source-arrow-color': 'rgba(148,163,184,0.3)',
+                'width': 1.5,
+            }
+        },
+        // Semester Filter Dimming (low transparency instead of removing nodes)
+        {
+            selector: 'node.filter-dimmed',
+            style: {
+                'opacity': 0.14,
+            }
+        },
+        {
+            selector: 'edge.filter-dimmed',
+            style: {
+                'opacity': 0.06,
+            }
+        },
+        // Hover Highlighting
+        { selector: '.dimmed', style: { 'opacity': 0.08 } },
+        { selector: '.highlighted', style: { 'border-width': 4, 'border-color': '#fbbf24', 'z-index': 999, 'opacity': 1 } },
+        { selector: '.connected', style: { 'opacity': 1 } },
+        {
+            selector: '.connected-edge',
+            style: {
+                'opacity': 1,
+                'width': 3,
+                'line-color': 'rgba(251,191,36,0.65)',
+                'target-arrow-color': 'rgba(251,191,36,0.65)',
+                'source-arrow-color': 'rgba(251,191,36,0.65)',
+            }
+        },
+    ];
+
+    // ═══════════════════════════════════════════════════════
+    //  GRAPH STATE
+    // ═══════════════════════════════════════════════════════
+    let cy = null;
+    let currentTrack = 'complete';
+    let selectedNode = null;
+    // Semester filters: "1-1" means Year 1 Sem 1, etc. All active by default.
+    const activeFilters = new Set(['1-1','1-2','2-1','2-2','3-1','3-2','4-1','4-2']);
+
+    // ═══════════════════════════════════════════════════════
+    //  BUILD ELEMENTS FOR A TRACK (STABLE LAYOUT)
+    // ═══════════════════════════════════════════════════════
+    function getElements(trackId) {
+        const track = tracks[trackId];
+        const courseIds = new Set(track.courses);
+
+        const nodes = track.courses
+            .filter(id => courses[id])
+            .map(id => {
+                const c = courses[id];
+                return {
+                    data: {
+                        id,
+                        label: `${id}\n${c.abbr}`,
+                        category: c.category,
+                    }
+                };
+            });
+
+        const edges = allEdges
+            .filter(e => courseIds.has(e.from) && courseIds.has(e.to))
+            .map(e => ({
+                data: {
+                    id: `${e.from}-${e.to}`,
+                    source: e.from,
+                    target: e.to,
+                    type: e.type,
+                }
+            }));
+
+        return [...nodes, ...edges];
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  APPLY SEMESTER FILTERS VIA OPACITY (NO LAYOUT JUMP)
+    // ═══════════════════════════════════════════════════════
+    function applySemesterFilters() {
+        if (!cy) return;
+
+        cy.batch(() => {
+            cy.nodes().forEach(node => {
+                const c = courses[node.id()];
+                if (!c) return;
+                const isMatch = activeFilters.has(`${c.year}-${c.sem}`);
+                if (isMatch) {
+                    node.removeClass('filter-dimmed');
+                } else {
+                    node.addClass('filter-dimmed');
+                }
+            });
+
+            cy.edges().forEach(edge => {
+                const srcDimmed = edge.source().hasClass('filter-dimmed');
+                const tgtDimmed = edge.target().hasClass('filter-dimmed');
+                if (srcDimmed || tgtDimmed) {
+                    edge.addClass('filter-dimmed');
+                } else {
+                    edge.removeClass('filter-dimmed');
+                }
+            });
+        });
+
+        const totalNodes = cy.nodes().length;
+        const activeNodes = cy.nodes().not('.filter-dimmed').length;
+        const track = tracks[currentTrack];
+
+        if (activeNodes === 0) {
+            document.getElementById('graph-subtitle').textContent = 'All courses dimmed (no matching semester selected)';
+        } else if (activeNodes < totalNodes) {
+            document.getElementById('graph-subtitle').textContent = `Highlighting ${activeNodes} of ${totalNodes} courses`;
+        } else {
+            document.getElementById('graph-subtitle').textContent = track.subtitle;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  RENDER GRAPH
+    // ═══════════════════════════════════════════════════════
+    function renderGraph(trackId) {
+        if (cy) cy.destroy();
+
+        const track = tracks[trackId];
+        const elements = getElements(trackId);
+
+        cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements,
+            style: cyStyle,
+            userZoomingEnabled: true,
+            userPanningEnabled: true,
+            boxSelectionEnabled: false,
+            autoungrabify: true,
+            minZoom: 0.25,
+            maxZoom: 3.5,
+            wheelSensitivity: 0.15,
+        });
+
+        if (elements.length > 0) {
+            cy.layout({
+                name: 'dagre',
+                rankDir: 'TB',
+                rankSep: track.rankSep,
+                nodeSep: track.nodeSep,
+                padding: 40,
+                animate: false,
+                fit: true,
+            }).run();
+        }
+
+        // Apply current active semester opacity
+        applySemesterFilters();
+
+        // Debounced Hover Highlighting (waits 250ms before highlighting to avoid rapid flickering)
+        let hoverTimeout = null;
+        let isHoverActive = false;
+
+        function clearHoverHighlight() {
+            if (hoverTimeout) {
+                clearTimeout(hoverTimeout);
+                hoverTimeout = null;
+            }
+            if (isHoverActive) {
+                cy.elements().removeClass('dimmed highlighted connected connected-edge');
+                isHoverActive = false;
+            }
+        }
+
+        cy.on('mouseover', 'node', e => {
+            const node = e.target;
+            if (hoverTimeout) clearTimeout(hoverTimeout);
+
+            hoverTimeout = setTimeout(() => {
+                if (!cy) return;
+                const hood = node.closedNeighborhood();
+                cy.elements().addClass('dimmed');
+                hood.removeClass('dimmed');
+                node.addClass('highlighted');
+                hood.edges().addClass('connected-edge');
+                hood.nodes().not(node).addClass('connected');
+                isHoverActive = true;
+                hoverTimeout = null;
+            }, 250);
+        });
+
+        cy.on('mouseout', 'node', () => {
+            clearHoverHighlight();
+        });
+
+        cy.on('pan zoom', () => {
+            clearHoverHighlight();
+        });
+
+        // Click to show info
+        cy.on('tap', 'node', e => {
+            const nodeId = e.target.id();
+            if (selectedNode === nodeId) {
+                hideInfoPanel();
+            } else {
+                showInfoPanel(nodeId);
+            }
+        });
+
+        // Click background to close
+        cy.on('tap', e => {
+            if (e.target === cy) hideInfoPanel();
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  INFO PANEL
+    // ═══════════════════════════════════════════════════════
+    function showInfoPanel(courseId) {
+        const course = courses[courseId];
+        if (!course) return;
+        selectedNode = courseId;
+
+        const color = categoryColors[course.category] || '#94a3b8';
+        const trackCourses = new Set(tracks[currentTrack].courses);
+
+        // Incoming edges: prerequisites OF this course
+        const prereqs = allEdges
+            .filter(e => e.to === courseId && trackCourses.has(e.from) && courses[e.from])
+            .map(e => ({ id: e.from, ...courses[e.from], edgeType: e.type }));
+
+        // Outgoing edges: courses that NEED this course
+        const dependents = allEdges
+            .filter(e => e.from === courseId && trackCourses.has(e.to) && courses[e.to])
+            .map(e => ({ id: e.to, ...courses[e.to], edgeType: e.type }));
+
+        const isCodeValid = /^\d+$/.test(courseId);
+        const panel = document.getElementById('info-inner');
+
+        panel.innerHTML = `
+            <div class="info-header">
+                <button class="info-close" onclick="hideInfoPanel()">×</button>
+                <div class="info-code" style="color:${color}">${courseId}</div>
+                <div class="info-name">${course.name}</div>
+                <div class="info-badges">
+                    <span class="badge" style="background:${color}22;color:${color};border:1px solid ${color}33">${course.credits} credit${course.credits > 1 ? 's' : ''}</span>
+                    <span class="badge outline">Year ${course.year} · Sem ${course.sem}</span>
+                </div>
+            </div>
+            <div class="info-desc">${course.desc}</div>
+            ${prereqs.length ? `
+                <div class="info-section">
+                    <h3>Prerequisites</h3>
+                    ${prereqs.map(p => `
+                        <div class="dep-item" onclick="focusNode('${p.id}')">
+                            <span class="dep-code">${p.id}</span>
+                            <span class="dep-name">${p.abbr}</span>
+                            <span class="dep-type ${p.edgeType}">${p.edgeType}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+            ${dependents.length ? `
+                <div class="info-section">
+                    <h3>Leads To</h3>
+                    ${dependents.map(d => `
+                        <div class="dep-item" onclick="focusNode('${d.id}')">
+                            <span class="dep-code">${d.id}</span>
+                            <span class="dep-name">${d.abbr}</span>
+                            <span class="dep-type ${d.edgeType}">${d.edgeType}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+            ${isCodeValid ? `
+                <a class="cugetreg-link" href="https://cugetreg.com/S/courses/${courseId}" target="_blank" rel="noopener noreferrer">
+                    View on CU Get Reg ↗
+                </a>
+            ` : ''}
+        `;
+
+        document.getElementById('info-panel').classList.add('visible');
+    }
+
+    function hideInfoPanel() {
+        selectedNode = null;
+        document.getElementById('info-panel').classList.remove('visible');
+    }
+
+    function focusNode(nodeId) {
+        const node = cy.$('#' + nodeId);
+        if (node.length) {
+            cy.animate({ center: { eles: node }, zoom: cy.zoom() }, { duration: 350 });
+            showInfoPanel(nodeId);
+        }
+    }
+
+    function resetView() {
+        cy?.fit(50);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  TAB SWITCHING
+    // ═══════════════════════════════════════════════════════
+    function switchTab(trackId) {
+        if (trackId === currentTrack) return;
+        currentTrack = trackId;
+        hideInfoPanel();
+
+        document.querySelectorAll('.tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.track === trackId);
+        });
+
+        // Small delay so panel closes before graph re-renders
+        setTimeout(() => renderGraph(trackId), 50);
+    }
+
+    // Wire up tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab.dataset.track));
+    });
+
+    // ═══════════════════════════════════════════════════════
+    //  SEMESTER FILTERING
+    // ═══════════════════════════════════════════════════════
+    const semButtons = document.querySelectorAll('.filter-btn[data-year]');
+
+    function updateActiveFilterUI() {
+        semButtons.forEach(btn => {
+            const key = `${btn.dataset.year}-${btn.dataset.sem}`;
+            btn.classList.toggle('active', activeFilters.has(key));
+        });
+    }
+
+    semButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const key = `${btn.dataset.year}-${btn.dataset.sem}`;
+            if (activeFilters.has(key)) {
+                activeFilters.delete(key);
+            } else {
+                activeFilters.add(key);
+            }
+            updateActiveFilterUI();
+            applySemesterFilters();
+        });
+    });
+
+    // Toggle entire year
+    document.querySelectorAll('.filter-year-btn').forEach(yBtn => {
+        yBtn.addEventListener('click', () => {
+            const y = yBtn.dataset.year;
+            const k1 = `${y}-1`;
+            const k2 = `${y}-2`;
+            const bothActive = activeFilters.has(k1) && activeFilters.has(k2);
+
+            if (bothActive) {
+                activeFilters.delete(k1);
+                activeFilters.delete(k2);
+            } else {
+                activeFilters.add(k1);
+                activeFilters.add(k2);
+            }
+            updateActiveFilterUI();
+            applySemesterFilters();
+        });
+    });
+
+    // Quick All / Clear
+    document.getElementById('filter-all')?.addEventListener('click', () => {
+        ['1-1','1-2','2-1','2-2','3-1','3-2','4-1','4-2'].forEach(k => activeFilters.add(k));
+        updateActiveFilterUI();
+        applySemesterFilters();
+    });
+
+    document.getElementById('filter-none')?.addEventListener('click', () => {
+        activeFilters.clear();
+        updateActiveFilterUI();
+        applySemesterFilters();
+    });
+
+    // Escape key closes panel
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') hideInfoPanel();
+    });
+
+    // ═══════════════════════════════════════════════════════
+    //  LEGEND
+    // ═══════════════════════════════════════════════════════
+    const legendBar = document.getElementById('legend-bar');
+    Object.entries(categoryLabels).forEach(([cat, label]) => {
+        const item = document.createElement('div');
+        item.className = 'legend-item';
+        item.innerHTML = `<div class="legend-dot" style="background:${categoryColors[cat]}"></div><span>${label}</span>`;
+        legendBar.appendChild(item);
+    });
+
+    // ═══════════════════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════════════════
+    renderGraph('complete');
+    </script>
+</body>
+</html>
+
