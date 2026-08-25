@@ -385,6 +385,17 @@
             border-color: rgba(96,165,250,0.3);
         }
 
+        .cugetreg-link.disabled {
+            background: rgba(148,163,184,0.05);
+            border: 1px dashed rgba(148,163,184,0.25);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+        .cugetreg-link.disabled:hover {
+            background: rgba(148,163,184,0.05);
+            border-color: rgba(148,163,184,0.25);
+        }
+
         /* ── Edge Legend ── */
         .edge-legend {
             display: flex;
@@ -764,6 +775,7 @@
         courseByKey[c.key] = c;
     });
     const verifySet = new Set(DATA.topicsToVerify || []);
+    const noGetReg = new Set(DATA.getRegUnavailable || []);
 
     // ═══════════════════════════════════════════════════════
     //  PROGRESS STORAGE  (localStorage, per-browser)
@@ -1177,6 +1189,7 @@
         const prereqs = DATA.edges.filter(e => e.to === courseKey && trackKeys.has(e.from) && courseByKey[e.from]).map(e => ({ key: e.from, ...courseByKey[e.from], edgeType: e.type }));
         const dependents = DATA.edges.filter(e => e.from === courseKey && trackKeys.has(e.to) && courseByKey[e.to]).map(e => ({ key: e.to, ...courseByKey[e.to], edgeType: e.type }));
         const isCodeValid = /^\d+$/.test(course.code);
+        const getRegOff = noGetReg.has(courseKey);
         const topics = course.topics || [];
         const frac = courseFraction(courseKey), total = topics.length, learned = courseLearned(courseKey);
 
@@ -1232,8 +1245,10 @@
                             <span class="dep-type ${d.edgeType}">${d.edgeType}</span>
                         </div>`).join('')}
                 </div>` : ''}
-            ${isCodeValid ? `
+            ${isCodeValid && !getRegOff ? `
                 <a class="cugetreg-link" href="${DATA.meta.getRegBase}${course.code}" target="_blank" rel="noopener noreferrer">View on CU Get Reg ↗</a>` : ''}
+            ${isCodeValid && getRegOff ? `
+                <div class="cugetreg-link disabled" title="This course has no CU Get Reg page yet">CU Get Reg — not available</div>` : ''}
         `;
         document.getElementById('info-panel').classList.add('visible');
     }

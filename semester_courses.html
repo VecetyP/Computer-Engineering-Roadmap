@@ -264,6 +264,24 @@
             font-weight: bold;
         }
 
+        /* "no CU Get Reg page" state */
+        .course-card.no-getreg { cursor: default; }
+        .na-badge {
+            position: absolute;
+            top: 3px;
+            right: 4px;
+            font-size: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: #fff;
+            background: rgba(0,0,0,0.30);
+            border-radius: 3px;
+            padding: 1px 4px;
+            line-height: 1.3;
+            pointer-events: none;
+        }
+
         /* Category Color Classes */
         .bg-light-green { background-color: var(--c-light-green); }
         .bg-blue { background-color: var(--c-blue); }
@@ -293,6 +311,7 @@
         //  All data comes from curriculum.js (window.CURRICULUM)
         // ─────────────────────────────────────────────────────────────
         const DATA = window.CURRICULUM;
+        const noGetReg = new Set(DATA.getRegUnavailable || []);
 
         // Page title from data
         document.getElementById('page-title').innerText =
@@ -366,15 +385,28 @@
 
                 courses.forEach(course => {
                     const isCodeValid = /^\d+$/.test(course.code);
+                    const linkable = isCodeValid && !noGetReg.has(course.key);
 
-                    const card = document.createElement(isCodeValid ? 'a' : 'div');
+                    const card = document.createElement(linkable ? 'a' : 'div');
                     card.className = `course-card bg-${course.color}`;
-                    card.setAttribute('data-legend', DATA.buckets[course.bucket].label);
+                    let tip = DATA.buckets[course.bucket].label;
+                    if (isCodeValid && !linkable) tip += ' · CU Get Reg not available';
+                    card.setAttribute('data-legend', tip);
 
-                    if (isCodeValid) {
+                    if (linkable) {
                         card.href = `${DATA.meta.getRegBase}${course.code}`;
                         card.target = "_blank";
                         card.rel = "noopener noreferrer";
+                    }
+
+                    // Small indicator for courses with a real code but no CU Get Reg page
+                    if (isCodeValid && !linkable) {
+                        card.classList.add('no-getreg');
+                        const flag = document.createElement('span');
+                        flag.className = 'na-badge';
+                        flag.textContent = 'n/a';
+                        flag.title = 'CU Get Reg page not available';
+                        card.appendChild(flag);
                     }
 
                     const name = document.createElement('div');
