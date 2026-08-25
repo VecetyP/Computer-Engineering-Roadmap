@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Engineering DAG: CU</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>'>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -64,6 +65,7 @@
         }
 
         .view-switch .vs-icon { font-size: 0.9rem; line-height: 1; }
+        .view-switch.home { right: auto; left: 0; }
 
         @media (max-width: 640px) {
             .view-switch .vs-text { display: none; }
@@ -679,6 +681,9 @@
         <header class="header">
             <h1>Computer Engineering Roadmap</h1>
             <p class="subtitle" id="subtitle"></p>
+            <a class="view-switch home" href="index.html" title="Back to home">
+                <span class="vs-icon">⌂</span><span class="vs-text">Home</span>
+            </a>
             <a class="view-switch" href="semester_courses.html" title="Switch to the semester grid view">
                 <span class="vs-icon">▦</span><span class="vs-text">Semester Grid</span>
             </a>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Computer Engineering Roadmap</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>'>
     <!-- Single source of truth: all course data lives in curriculum.js -->
     <script src="curriculum.js"></script>
     <style>
@@ -88,6 +89,7 @@
         }
 
         .view-switch .vs-icon { font-size: 0.95rem; line-height: 1; }
+        .view-switch.home { right: auto; left: 0; }
 
         @media (max-width: 640px) {
             .view-switch .vs-text { display: none; }
@@ -299,6 +301,9 @@
 
     <div class="page-header">
         <h1 id="page-title"></h1>
+        <a class="view-switch home" href="index.html" title="Back to home">
+            <span class="vs-icon">⌂</span><span class="vs-text">Home</span>
+        </a>
         <a class="view-switch" href="dag_roadmap.html" title="Switch to the prerequisite graph view">
             <span class="vs-icon">⋔</span><span class="vs-text">Prerequisite Map</span>
         </a>

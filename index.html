@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Engineering Roadmap · CU</title>
+    <meta name="description" content="An interactive map of Chulalongkorn University's Computer Engineering curriculum — see prerequisites, plan your terms, and track what you've learned.">
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>'>
+    <!-- Social link preview -->
+    <meta property="og:title" content="Computer Engineering Roadmap · Chulalongkorn University">
+    <meta property="og:description" content="Interactive prerequisite map + term-by-term plan for the CU Computer Engineering curriculum. Track your progress as you go.">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #0a0a14 0%, #12122a 35%, #0f1b2d 70%, #0a1628 100%);
+            background-attachment: fixed;
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap { max-width: 880px; margin: 0 auto; padding: 6vh 22px 60px; }
+
+        /* Hero */
+        .hero { text-align: center; margin-bottom: 40px; }
+        .kicker {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+            color: #64748b; margin-bottom: 14px;
+        }
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.1rem);
+            font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 45%, #2dd4bf 100%);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 14px;
+        }
+        .tagline { color: #94a3b8; font-size: 1.05rem; max-width: 54ch; margin: 0 auto; }
+
+        /* Nav cards */
+        .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 36px 0; }
+        @media (max-width: 620px) { .cards { grid-template-columns: 1fr; } }
+        .card {
+            display: block; text-decoration: none; color: inherit;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 26px 24px;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .card:hover { transform: translateY(-3px); border-color: rgba(96,165,250,0.4); background: rgba(255,255,255,0.05); }
+        .card .ic { font-size: 1.7rem; margin-bottom: 12px; display: block; }
+        .card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+        .card p { color: #94a3b8; font-size: 0.9rem; }
+        .card .go { margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #60a5fa; }
+        .card:hover .go { color: #93c5fd; }
+
+        /* How to use */
+        .section-label {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+            letter-spacing: 0.14em; text-transform: uppercase; color: #64748b;
+            text-align: center; margin-bottom: 18px;
+        }
+        .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+        .tip {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 16px 18px;
+        }
+        .tip .n { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; color: #2dd4bf; }
+        .tip h3 { font-size: 0.95rem; font-weight: 600; margin: 6px 0 4px; }
+        .tip p { font-size: 0.84rem; color: #94a3b8; }
+        .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; }
+        .swatch.done { background: #34d399; }
+        .swatch.ready { border: 2px dashed #22d3ee; width: 12px; height: 12px; }
+
+        /* Disclaimer */
+        .disclaimer {
+            margin: 34px 0 0; padding: 14px 18px;
+            background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2);
+            border-radius: 10px; font-size: 0.85rem; color: #cbd5e1;
+            display: flex; gap: 10px; align-items: flex-start;
+        }
+        .disclaimer .badge { color: #fbbf24; flex-shrink: 0; }
+
+        footer {
+            margin-top: 40px; text-align: center; color: #475569; font-size: 0.78rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        footer a { color: #64748b; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <header class="hero">
+            <div class="kicker">Chulalongkorn University · B.Eng. · Curriculum 2024</div>
+            <h1>Computer Engineering Roadmap</h1>
+            <p class="tagline">See how every course connects, plan your four years term by term, and track what you've actually learned.</p>
+        </header>
+
+        <div class="cards">
+            <a class="card" href="dag_roadmap.html">
+                <span class="ic">🔗</span>
+                <h2>Prerequisite Map</h2>
+                <p>An interactive graph of every core course and what it unlocks. Click a course to see its topics, prerequisites, and progress.</p>
+                <div class="go">Open the map →</div>
+            </a>
+            <a class="card" href="semester_courses.html">
+                <span class="ic">▦</span>
+                <h2>Semester Grid</h2>
+                <p>The full four-year plan laid out term by term, colour-coded by requirement category, with credit totals.</p>
+                <div class="go">Open the grid →</div>
+            </a>
+        </div>
+
+        <div class="section-label">How to use it</div>
+        <div class="tips">
+            <div class="tip">
+                <div class="n">01</div>
+                <h3>Click a course</h3>
+                <p>Open its panel to read the description, its prerequisites, and what it leads to.</p>
+            </div>
+            <div class="tip">
+                <div class="n">02</div>
+                <h3>Tick topics as you learn</h3>
+                <p>The ring around each course fills up and turns <span class="swatch done"></span> green when you finish it.</p>
+            </div>
+            <div class="tip">
+                <div class="n">03</div>
+                <h3>Watch what unlocks</h3>
+                <p>A <span class="swatch ready"></span> dashed outline means you've cleared the prerequisites and can take it next.</p>
+            </div>
+            <div class="tip">
+                <div class="n">04</div>
+                <h3>Your progress is saved</h3>
+                <p>It stays in your browser — no account needed. Use <b>Export</b> on the map to back it up.</p>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <span class="badge">⚠</span>
+            <span>Unofficial, student-made. Course data can go out of date — always confirm against the official curriculum and your advisor before you enroll.</span>
+        </div>
+
+        <footer>
+            Made by students, for students · <a href="dag_roadmap.html">Map</a> · <a href="semester_courses.html">Grid</a>
+        </footer>
+    </div>
+</body>
+</html>
