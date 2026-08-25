@@ -282,7 +282,9 @@ window.CURRICULUM = {
    * =======================================================================*/
   edges: [
     /* ── Hard Prerequisites ──────────────────────────────────────────────*/
-    { from: 'comp_prog',     to: 'prog_meth1',   type: 'prereq' },
+    // CU Get Reg lists NO formal prerequisite for Programming Methodology I,
+    // so this is a recommended flow (take Computer Programming first), not a hard gate.
+    { from: 'comp_prog',     to: 'prog_meth1',   type: 'recommended' },
     { from: 'comp_prog',     to: 'data_struct',  type: 'prereq' },
     { from: 'data_struct',   to: 'algo',         type: 'prereq' },
     { from: 'discrete',      to: 'algo',         type: 'prereq' },
