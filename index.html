@@ -6,150 +6,253 @@
     <title>Computer Engineering Roadmap · CU</title>
     <meta name="description" content="An interactive map of Chulalongkorn University's Computer Engineering curriculum — see prerequisites, plan your terms, and track what you've learned.">
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🎓</text></svg>'>
-    <!-- Social link preview -->
     <meta property="og:title" content="Computer Engineering Roadmap · Chulalongkorn University">
     <meta property="og:description" content="Interactive prerequisite map + term-by-term plan for the CU Computer Engineering curriculum. Track your progress as you go.">
     <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --ink: #0a0f0d;
+            --ink-2: #0e1512;
+            --ink-3: #141c18;
+            --line: rgba(233,255,242,0.09);
+            --line-2: rgba(233,255,242,0.16);
+            --text: #eaf1ec;
+            --text-dim: #9db0a5;
+            --text-faint: #6a7d73;
+            --accent: #34e39b;
+            --accent-2: #17b981;
+            --accent-soft: rgba(52,227,155,0.12);
+            /* content colors (graph only) */
+            --c-purple: #a78bfa; --c-teal: #2dd4bf; --c-blue: #60a5fa; --c-red: #fb7185;
+            --font-display: 'Schibsted Grotesk', system-ui, sans-serif;
+            --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(145deg, #0a0a14 0%, #12122a 35%, #0f1b2d 70%, #0a1628 100%);
-            background-attachment: fixed;
-            color: #e2e8f0;
-            min-height: 100vh;
+            background: var(--ink);
+            color: var(--text);
+            font-family: var(--font-body);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            /* faint structural glow, not decorative blur */
+            background-image: radial-gradient(1100px 620px at 78% -8%, rgba(52,227,155,0.07), transparent 60%);
+            background-repeat: no-repeat;
+            min-height: 100vh;
         }
+        .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+        a { color: inherit; text-decoration: none; }
 
-        .wrap { max-width: 880px; margin: 0 auto; padding: 6vh 22px 60px; }
-
-        /* Hero */
-        .hero { text-align: center; margin-bottom: 40px; }
-        .kicker {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
-            color: #64748b; margin-bottom: 14px;
+        /* ── Top bar ── */
+        .topbar { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.95rem; letter-spacing: -0.01em; }
+        .brand .mark {
+            width: 26px; height: 26px; border-radius: 7px;
+            background: var(--accent-soft); border: 1px solid var(--accent);
+            display: grid; place-items: center; color: var(--accent); font-size: 0.9rem;
         }
+        .topbar .meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-faint); }
+
+        /* ── Hero ── */
+        .hero {
+            display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center;
+            padding: clamp(36px, 8vh, 92px) 0 64px;
+        }
+        .eyebrow { font-size: 0.9rem; color: var(--accent); font-weight: 600; margin-bottom: 20px; }
         h1 {
-            font-size: clamp(2rem, 6vw, 3.1rem);
-            font-weight: 800; letter-spacing: -0.03em; line-height: 1.05;
-            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 45%, #2dd4bf 100%);
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 14px;
+            font-family: var(--font-display); font-weight: 800;
+            font-size: clamp(2.4rem, 5.4vw, 4rem); line-height: 1.02; letter-spacing: -0.035em;
+            text-wrap: balance; margin-bottom: 22px;
         }
-        .tagline { color: #94a3b8; font-size: 1.05rem; max-width: 54ch; margin: 0 auto; }
+        h1 .em { color: var(--accent); }
+        .lede { font-size: 1.12rem; color: var(--text-dim); max-width: 46ch; margin-bottom: 34px; }
 
-        /* Nav cards */
-        .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 36px 0; }
-        @media (max-width: 620px) { .cards { grid-template-columns: 1fr; } }
-        .card {
-            display: block; text-decoration: none; color: inherit;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px; padding: 26px 24px;
-            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .btn {
+            font-family: var(--font-body); font-size: 0.98rem; font-weight: 600;
+            padding: 13px 22px; border-radius: 11px; cursor: pointer; border: 1px solid transparent;
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+            display: inline-flex; align-items: center; gap: 9px;
         }
-        .card:hover { transform: translateY(-3px); border-color: rgba(96,165,250,0.4); background: rgba(255,255,255,0.05); }
-        .card .ic { font-size: 1.7rem; margin-bottom: 12px; display: block; }
-        .card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
-        .card p { color: #94a3b8; font-size: 0.9rem; }
-        .card .go { margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #60a5fa; }
-        .card:hover .go { color: #93c5fd; }
+        .btn-primary { background: var(--accent); color: #04120b; }
+        .btn-primary:hover { background: #4af0aa; transform: translateY(-2px); }
+        .btn-ghost { color: var(--text); border-color: var(--line-2); }
+        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+        .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+        .btn .arw { transition: transform 0.18s ease; }
+        .btn-primary:hover .arw { transform: translateX(3px); }
 
-        /* How to use */
-        .section-label {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
-            letter-spacing: 0.14em; text-transform: uppercase; color: #64748b;
-            text-align: center; margin-bottom: 18px;
+        /* ── Hero graph ── */
+        .hero-graph { width: 100%; height: auto; }
+        .hg-edge {
+            fill: none; stroke: var(--line-2); stroke-width: 2;
+            stroke-dasharray: 1; stroke-dashoffset: 1;
+            animation: draw 0.9s cubic-bezier(0.16,1,0.3,1) forwards;
         }
-        .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-        .tip {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px; padding: 16px 18px;
+        .hg-edge.rec { stroke-dasharray: 0.04 0.04; }  /* recommended: dotted, no draw anim conflict */
+        .hg-node {
+            opacity: 0; transform: scale(0.9); transform-origin: center;
+            transform-box: fill-box;
+            animation: pop 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
         }
-        .tip .n { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; color: #2dd4bf; }
-        .tip h3 { font-size: 0.95rem; font-weight: 600; margin: 6px 0 4px; }
-        .tip p { font-size: 0.84rem; color: #94a3b8; }
-        .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; }
-        .swatch.done { background: #34d399; }
-        .swatch.ready { border: 2px dashed #22d3ee; width: 12px; height: 12px; }
+        .hg-node rect { rx: 10; }
+        .hg-code { font-family: var(--font-mono); font-weight: 600; font-size: 12px; fill: #05100b; }
+        .ring-track { fill: none; stroke: rgba(233,255,242,0.10); stroke-width: 3.5; }
+        .ring-fg {
+            fill: none; stroke: var(--accent); stroke-width: 3.5; stroke-linecap: round;
+            stroke-dasharray: 1; stroke-dashoffset: 1;
+            animation: fill 1s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+        }
+        .n1 { animation-delay: 0.15s; } .n2 { animation-delay: 0.30s; }
+        .n3 { animation-delay: 0.45s; } .n4 { animation-delay: 0.55s; } .n5 { animation-delay: 0.6s; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        @keyframes fill { to { stroke-dashoffset: 0.3; } }   /* 70% */
+        @keyframes pop { to { opacity: 1; transform: scale(1); } }
 
-        /* Disclaimer */
-        .disclaimer {
-            margin: 34px 0 0; padding: 14px 18px;
-            background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2);
-            border-radius: 10px; font-size: 0.85rem; color: #cbd5e1;
-            display: flex; gap: 10px; align-items: flex-start;
+        @media (prefers-reduced-motion: reduce) {
+            .hg-edge { stroke-dashoffset: 0; animation: none; }
+            .hg-node { opacity: 1; transform: none; animation: none; }
+            .ring-fg { stroke-dashoffset: 0.3; animation: none; }
+            html { scroll-behavior: auto; }
         }
-        .disclaimer .badge { color: #fbbf24; flex-shrink: 0; }
 
-        footer {
-            margin-top: 40px; text-align: center; color: #475569; font-size: 0.78rem;
-            font-family: 'JetBrains Mono', monospace;
+        /* ── Capabilities (not a card grid: hairline-separated rows) ── */
+        .caps { padding: 18px 0 84px; }
+        .caps h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .caps .sub { color: var(--text-dim); margin-bottom: 30px; font-size: 0.98rem; }
+        .cap-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
+        .cap {
+            padding: 26px 24px 26px 0; border-right: 1px solid var(--line);
         }
-        footer a { color: #64748b; }
+        .cap:last-child { border-right: none; padding-right: 0; }
+        .cap .ci {
+            width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+            background: var(--accent-soft); color: var(--accent); margin-bottom: 14px; font-size: 1rem;
+        }
+        .cap h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; }
+        .cap p { color: var(--text-dim); font-size: 0.9rem; max-width: 34ch; }
+        .cap .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; vertical-align: baseline; }
+        .cap .dot.done { background: var(--accent); }
+        .cap .dot.ready { border: 1.5px dashed var(--c-teal); border-radius: 3px; width: 11px; height: 11px; }
+
+        /* ── Footer / disclaimer ── */
+        footer { border-top: 1px solid var(--line); padding: 26px 0 40px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: flex-end; }
+        .disc { color: var(--text-faint); font-size: 0.82rem; max-width: 52ch; }
+        .disc b { color: var(--text-dim); font-weight: 600; }
+        .foot-links { display: flex; gap: 18px; font-size: 0.85rem; color: var(--text-dim); }
+        .foot-links a:hover { color: var(--accent); }
+
+        @media (max-width: 860px) {
+            .hero { grid-template-columns: 1fr; gap: 30px; padding-top: 20px; }
+            .hero-graph-wrap { order: -1; }
+            .cap-list { grid-template-columns: 1fr; }
+            .cap { border-right: none; border-bottom: 1px solid var(--line); padding: 22px 0; }
+            .cap:last-child { border-bottom: none; }
+        }
+        @media (max-width: 560px) {
+            .brand { white-space: nowrap; }
+            .topbar .meta { display: none; }
+        }
     </style>
 </head>
 <body>
     <div class="wrap">
+
+        <nav class="topbar">
+            <div class="brand"><span class="mark">◧</span> CE Roadmap</div>
+            <div class="meta">CHULALONGKORN · B.ENG · 2024</div>
+        </nav>
+
         <header class="hero">
-            <div class="kicker">Chulalongkorn University · B.Eng. · Curriculum 2024</div>
-            <h1>Computer Engineering Roadmap</h1>
-            <p class="tagline">See how every course connects, plan your four years term by term, and track what you've actually learned.</p>
+            <div class="hero-copy">
+                <div class="eyebrow">Computer Engineering · Chulalongkorn University</div>
+                <h1>Every course, and&nbsp;<span class="em">how they connect.</span></h1>
+                <p class="lede">Map the whole four-year curriculum, see exactly what unlocks what, and track everything you've learned — right down to the topic.</p>
+                <div class="cta-row">
+                    <a class="btn btn-primary" href="dag_roadmap.html">Open the roadmap <span class="arw">→</span></a>
+                    <a class="btn btn-ghost" href="semester_courses.html">Browse by semester</a>
+                </div>
+            </div>
+
+            <div class="hero-graph-wrap">
+                <svg class="hero-graph" viewBox="0 0 440 250" role="img" aria-label="A fragment of the prerequisite map: Computer Programming leads to Data Structures, which leads to Algorithm Design and Operating Systems, with Discrete Structures also feeding in.">
+                    <defs>
+                        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                            <path d="M0 0 L10 5 L0 10 z" fill="rgba(233,255,242,0.30)"/>
+                        </marker>
+                    </defs>
+                    <!-- edges (drawn behind nodes) -->
+                    <path class="hg-edge" pathLength="1" marker-end="url(#ah)" d="M120 55 L176 105"/>
+                    <path class="hg-edge" pathLength="1" marker-end="url(#ah)" d="M120 190 L176 130"/>
+                    <path class="hg-edge" pathLength="1" marker-end="url(#ah)" d="M272 105 L320 66"/>
+                    <path class="hg-edge" pathLength="1" marker-end="url(#ah)" d="M272 125 L320 178"/>
+
+                    <!-- node: comp prog (purple) -->
+                    <g class="hg-node n1">
+                        <rect x="24" y="34" width="96" height="42" fill="var(--c-purple)"/>
+                        <text class="hg-code" x="72" y="60" text-anchor="middle">2110101</text>
+                    </g>
+                    <!-- node: discrete (blue) -->
+                    <g class="hg-node n3">
+                        <rect x="24" y="169" width="96" height="42" fill="var(--c-blue)"/>
+                        <text class="hg-code" x="72" y="195" text-anchor="middle">2110200</text>
+                    </g>
+                    <!-- node: data struct (teal) — focal, progress ring -->
+                    <g class="hg-node n2">
+                        <rect x="176" y="94" width="96" height="42" fill="var(--c-teal)"/>
+                        <text class="hg-code" x="224" y="120" text-anchor="middle">2110211</text>
+                        <rect class="ring-track" x="170" y="88" width="108" height="54" rx="14"/>
+                        <rect class="ring-fg" x="170" y="88" width="108" height="54" rx="14" pathLength="1"/>
+                    </g>
+                    <!-- node: algo (purple) -->
+                    <g class="hg-node n4">
+                        <rect x="320" y="40" width="96" height="42" fill="var(--c-purple)"/>
+                        <text class="hg-code" x="368" y="66" text-anchor="middle">2110327</text>
+                    </g>
+                    <!-- node: OS (red) -->
+                    <g class="hg-node n5">
+                        <rect x="320" y="158" width="96" height="42" fill="var(--c-red)"/>
+                        <text class="hg-code" x="368" y="184" text-anchor="middle">2110313</text>
+                    </g>
+                </svg>
+            </div>
         </header>
 
-        <div class="cards">
-            <a class="card" href="dag_roadmap.html">
-                <span class="ic">🔗</span>
-                <h2>Prerequisite Map</h2>
-                <p>An interactive graph of every core course and what it unlocks. Click a course to see its topics, prerequisites, and progress.</p>
-                <div class="go">Open the map →</div>
-            </a>
-            <a class="card" href="semester_courses.html">
-                <span class="ic">▦</span>
-                <h2>Semester Grid</h2>
-                <p>The full four-year plan laid out term by term, colour-coded by requirement category, with credit totals.</p>
-                <div class="go">Open the grid →</div>
-            </a>
-        </div>
-
-        <div class="section-label">How to use it</div>
-        <div class="tips">
-            <div class="tip">
-                <div class="n">01</div>
-                <h3>Click a course</h3>
-                <p>Open its panel to read the description, its prerequisites, and what it leads to.</p>
+        <section class="caps">
+            <h2>Built to plan with</h2>
+            <p class="sub">Three ways in, all reading from one source of truth.</p>
+            <div class="cap-list">
+                <div class="cap">
+                    <div class="ci">↳</div>
+                    <h3>See the dependencies</h3>
+                    <p>Click any course to trace its prerequisites and everything it leads to across all four years.</p>
+                </div>
+                <div class="cap">
+                    <div class="ci">◍</div>
+                    <h3>Track what you've learned</h3>
+                    <p>Tick topics as you go; a <span class="dot done"></span> ring fills around each course and turns green when you finish it.</p>
+                </div>
+                <div class="cap">
+                    <div class="ci">▦</div>
+                    <h3>Plan every term</h3>
+                    <p>A <span class="dot ready"></span> dashed outline flags what you're ready to take, term by term in the semester grid.</p>
+                </div>
             </div>
-            <div class="tip">
-                <div class="n">02</div>
-                <h3>Tick topics as you learn</h3>
-                <p>The ring around each course fills up and turns <span class="swatch done"></span> green when you finish it.</p>
-            </div>
-            <div class="tip">
-                <div class="n">03</div>
-                <h3>Watch what unlocks</h3>
-                <p>A <span class="swatch ready"></span> dashed outline means you've cleared the prerequisites and can take it next.</p>
-            </div>
-            <div class="tip">
-                <div class="n">04</div>
-                <h3>Your progress is saved</h3>
-                <p>It stays in your browser — no account needed. Use <b>Export</b> on the map to back it up.</p>
-            </div>
-        </div>
-
-        <div class="disclaimer">
-            <span class="badge">⚠</span>
-            <span>Unofficial, student-made. Course data can go out of date — always confirm against the official curriculum and your advisor before you enroll.</span>
-        </div>
+        </section>
 
         <footer>
-            Made by students, for students · <a href="dag_roadmap.html">Map</a> · <a href="semester_courses.html">Grid</a>
+            <p class="disc"><b>Unofficial, student-made.</b> Course data can go out of date — always confirm against the official curriculum and your advisor before you enroll.</p>
+            <div class="foot-links">
+                <a href="dag_roadmap.html">Roadmap</a>
+                <a href="semester_courses.html">Semester grid</a>
+            </div>
         </footer>
+
     </div>
 </body>
 </html>
