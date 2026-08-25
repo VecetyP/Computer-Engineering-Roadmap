@@ -23,6 +23,7 @@
             background: linear-gradient(145deg, #0a0a14 0%, #12122a 35%, #0f1b2d 70%, #0a1628 100%);
             color: #e2e8f0;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             overflow: hidden;
         }
@@ -31,6 +32,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            height: 100dvh;
             padding: 12px 18px 8px;
             gap: 8px;
         }
@@ -69,7 +71,7 @@
         .view-switch .vs-icon { font-size: 0.9rem; line-height: 1; }
         .view-switch.home { right: auto; left: 0; }
 
-        @media (max-width: 640px) {
+        @media (max-width: 720px) {
             .view-switch .vs-text { display: none; }
             .view-switch { padding: 6px 9px; }
         }
@@ -687,6 +689,66 @@
             border-radius: 5px;
             padding: 4px 7px;
         }
+
+        /* ══════════════════════════════════════════════════════
+           MOBILE / RESPONSIVE
+           ══════════════════════════════════════════════════════ */
+        @media (max-width: 720px) {
+            .app { padding: 8px 10px 8px; gap: 6px; }
+            .header h1 { font-size: 1.02rem; }
+            .header .subtitle { font-size: 0.6rem; }
+
+            /* Keep control rows to a single swipeable line instead of tall wraps */
+            .legend-bar,
+            .filter-bar,
+            .tab-bar {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                justify-content: flex-start;
+                scrollbar-width: none;
+            }
+            .legend-bar::-webkit-scrollbar,
+            .filter-bar::-webkit-scrollbar,
+            .tab-bar::-webkit-scrollbar { display: none; }
+            .legend-item,
+            .tab,
+            .filter-bar > * { flex: 0 0 auto; }
+
+            /* Reclaim vertical space for the graph */
+            .standalone-note { display: none; }
+
+            /* Info panel becomes a bottom sheet */
+            .info-panel {
+                top: auto; bottom: 0; left: 0; right: 0;
+                width: 100%; height: auto; max-height: 74%;
+                transform: translateY(110%);
+            }
+            .info-panel.visible { transform: translateY(0); }
+            .info-inner {
+                width: 100%; height: auto;
+                max-height: 74vh; max-height: 74dvh;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 -6px 30px rgba(0,0,0,0.55);
+            }
+            /* grab handle on the sheet */
+            .info-inner::before {
+                content: ''; display: block;
+                width: 40px; height: 4px; border-radius: 2px;
+                background: rgba(255,255,255,0.18);
+                margin: -4px auto 6px;
+                flex-shrink: 0;
+            }
+
+            /* keep the fit button reachable when the sheet is up */
+            .reset-btn { bottom: auto; top: 10px; right: 10px; }
+        }
+
+        @media (max-width: 520px) {
+            .edge-legend { display: none; }
+            .state-legend { display: none; }
+            .progress-summary { gap: 8px; padding: 6px 10px; }
+            .header .subtitle { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -1193,6 +1255,10 @@
             if (selectedNode === nodeId) hideInfoPanel(); else showInfoPanel(nodeId);
         });
         cy.on('tap', e => { if (e.target === cy) hideInfoPanel(); });
+
+        // Re-fit once the container has settled to its final size (mobile chrome,
+        // late layout) so the graph is centred rather than parked in a corner.
+        setTimeout(() => { if (cy) { cy.resize(); cy.fit(40); scheduleDraw(); } }, 80);
     }
 
     // ═══════════════════════════════════════════════════════
