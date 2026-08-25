@@ -33,7 +33,7 @@ Full field-by-field documentation is in the comment block at the top of `curricu
 
 ## Features
 
-- Color-coded categories (core CE, math/science, general education, etc.)
+- Color-coded categories (core CP, math/science, general education, etc.)
 - Three edge types: hard prerequisites, recommended flow, and corequisites
 - DAG track tabs (Software, Hardware, Math, Language) and per-semester filtering
 - Click-through links to CU Get Reg for every course with a real course number

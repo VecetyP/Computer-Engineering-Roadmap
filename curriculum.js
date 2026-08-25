@@ -327,27 +327,27 @@ window.CURRICULUM = {
    * =======================================================================*/
   tracks: {
     software: {
-      label: '💻 Software & Algorithms',
+      label: 'Software & Algorithms',
       subtitle: 'Programming → Data Structures → Algorithms, Databases, OS, Networking, Distributed Systems, and Software Engineering',
       keys: ['comp_prog', 'prog_meth1', 'discrete', 'data_struct', 'algo', 'db_sys',
              'os', 'dist_sys', 'com_eng_ess', 'comp_net', 'software_eng', 'cap_proj1', 'cap_proj2'],
       rankSep: 80, nodeSep: 45,
     },
     hardware: {
-      label: '⚡ Hardware & Architecture',
+      label: 'Hardware & Architecture',
       subtitle: 'Digital logic design → Computer architecture, FPGA synthesis, and embedded systems',
       keys: ['dig_logic', 'dig_logic_lab', 'com_sys_arch', 'hw_syn_lab', 'embedded_lab'],
       rankSep: 100, nodeSep: 60,
     },
     math: {
-      label: '📐 Math & Science',
+      label: 'Math & Science',
       subtitle: 'Calculus, physics, chemistry, statistics, and computer engineering mathematics',
       keys: ['calc1', 'calc2', 'gen_phys1', 'gen_phys2', 'gen_phys_lab1', 'gen_phys_lab2',
              'gen_chem', 'gen_chem_lab', 'stats', 'ce_math1', 'ce_math2'],
       rankSep: 75, nodeSep: 40,
     },
     language: {
-      label: '📝 Language',
+      label: 'Language',
       subtitle: 'English language skills from experiential learning to technical engineering writing',
       keys: ['exp_eng1', 'exp_eng2', 'com_pres', 'tech_writ'],
       rankSep: 100, nodeSep: 60,
@@ -356,7 +356,7 @@ window.CURRICULUM = {
 
   /* ---- The "Complete Map" tab config (courses come from dag:true) ---------*/
   completeTrack: {
-    label: '🔗 Complete Map',
+    label: 'Complete Map',
     subtitle: 'All courses with prerequisite, recommended, and corequisite relationships across the 4-year curriculum',
     rankSep: 65, nodeSep: 35,
   },
