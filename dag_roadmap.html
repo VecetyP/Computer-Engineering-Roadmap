@@ -8,9 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+    <!-- Graph libraries are vendored locally (see /lib) so the page never
+         depends on a CDN. Versions: cytoscape 3.28.1, dagre 0.8.5, cytoscape-dagre 2.5.0 -->
+    <script src="lib/cytoscape.min.js"></script>
+    <script src="lib/dagre.min.js"></script>
+    <script src="lib/cytoscape-dagre.js"></script>
     <!-- Single source of truth: all course data lives in curriculum.js -->
     <script src="curriculum.js"></script>
     <style>
@@ -186,6 +188,17 @@
         }
 
         #cy { width: 100%; height: 100%; position: relative; z-index: 2; }
+
+        .load-error {
+            position: absolute; inset: 0; z-index: 3;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 8px; padding: 24px; color: #94a3b8;
+        }
+        .load-error .le-emoji { font-size: 2rem; opacity: 0.8; }
+        .load-error b { color: #e2e8f0; font-size: 1rem; }
+        .load-error p { font-size: 0.82rem; max-width: 42ch; }
+        .load-error a { color: #60a5fa; font-size: 0.85rem; text-decoration: none; }
+        .load-error a:hover { text-decoration: underline; }
 
         /* Rings sit BELOW the cytoscape layer so edges/arrows draw on top of them */
         #cy-overlay {
@@ -1105,21 +1118,42 @@
     // ═══════════════════════════════════════════════════════
     //  RENDER GRAPH
     // ═══════════════════════════════════════════════════════
+    function showLoadError() {
+        const el = document.getElementById('cy');
+        if (el) el.innerHTML = '<div class="load-error"><div class="le-emoji">🛰️</div>' +
+            '<b>Couldn\'t load the interactive graph</b>' +
+            '<p>The graph library didn\'t load. Refreshing the page usually fixes it. The Semester Grid view still works.</p>' +
+            '<a href="semester_courses.html">Open the Semester Grid →</a></div>';
+        const sub = document.getElementById('graph-subtitle');
+        if (sub) sub.textContent = '';
+    }
+
     function renderGraph(trackId) {
+        // Graceful failure if the vendored graph libraries didn't load
+        if (typeof window.cytoscape === 'undefined' || typeof window.dagre === 'undefined') {
+            showLoadError();
+            return;
+        }
         if (cy) cy.destroy();
         const track = tracks[trackId];
         const elements = getElements(trackId);
 
-        cy = cytoscape({
-            container: document.getElementById('cy'),
-            elements, style: cyStyle,
-            userZoomingEnabled: true, userPanningEnabled: true,
-            boxSelectionEnabled: false, autoungrabify: true,
-            minZoom: 0.25, maxZoom: 3.5, wheelSensitivity: 0.15,
-        });
+        try {
+            cy = cytoscape({
+                container: document.getElementById('cy'),
+                elements, style: cyStyle,
+                userZoomingEnabled: true, userPanningEnabled: true,
+                boxSelectionEnabled: false, autoungrabify: true,
+                minZoom: 0.25, maxZoom: 3.5, wheelSensitivity: 0.15,
+            });
 
-        if (elements.length > 0) {
-            cy.layout({ name: 'dagre', rankDir: 'TB', rankSep: track.rankSep, nodeSep: track.nodeSep, padding: 40, animate: false, fit: true }).run();
+            if (elements.length > 0) {
+                cy.layout({ name: 'dagre', rankDir: 'TB', rankSep: track.rankSep, nodeSep: track.nodeSep, padding: 40, animate: false, fit: true }).run();
+            }
+        } catch (err) {
+            // e.g. the dagre layout extension failed to register
+            showLoadError();
+            return;
         }
 
         // Keep the progress-ring overlay in sync with pan / zoom / resize
