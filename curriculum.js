@@ -61,8 +61,11 @@ window.CURRICULUM = {
   },
 
   /* ---- Color palette: NAME only. Each page maps names to its own hex. ------
-   * (dag_roadmap uses bright tones on dark; semester_courses uses muted tones
-   * on light. Only the NAME is shared data; the hex values live in each page.)
+   * Only the NAME is shared data; the hex values live in each page. Since the
+   * redesign, dag_roadmap and semester_courses map the six shared names to the
+   * SAME bright-on-dark hex, so a category looks identical on both; the grid
+   * additionally uses light-green, dark-purple, orange and grey, which the graph
+   * has no need for. Keep them in step when editing either page.
    */
   palette: [
     'purple', 'teal', 'blue', 'pink', 'red',

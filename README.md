@@ -56,4 +56,4 @@ The topic lists live in `curriculum.js` under `courseTopics`, keyed by course `k
 
 ## Usage
 
-Open either `.html` file directly in any modern browser. `curriculum.js` must sit in the same folder (it does by default). An internet connection is needed for the graph libraries and web fonts (loaded from CDNs).
+Open either `.html` file directly in any modern browser. `curriculum.js`, `lib/`, and `fonts/` must sit in the same folder (they do by default). **No internet connection is needed** — the graph libraries and the web fonts are both vendored, so the pages work fully offline, including straight off disk over `file://`.

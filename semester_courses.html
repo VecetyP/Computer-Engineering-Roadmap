@@ -3,446 +3,763 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Engineering Roadmap</title>
+    <title>Semester Grid · Computer Engineering · CU</title>
+    <meta name="description" content="The CU Computer Engineering curriculum term by term — every course, its credits and requirement category, with your own progress laid over it.">
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%230a0f0d"/><g fill="none" stroke="%2334e39b" stroke-width="2.6" stroke-linecap="round"><path d="M16 11.2c0 3.4-5 2.6-5 6.4"/><path d="M16 11.2c0 3.4 5 2.6 5 6.4"/></g><g fill="%2334e39b"><circle cx="16" cy="8" r="3.2"/><circle cx="11" cy="23" r="3.2"/><circle cx="21" cy="23" r="3.2"/></g></svg>'>
+    <!-- Fonts are self-hosted in /fonts so the pages never depend on a CDN and
+         never flash a fallback face before the real one arrives (same reason the
+         graph libraries live in /lib). Variable woff2, latin + latin-ext.
+         No <link rel=preload>: a font preload must be CORS-mode, which has no valid
+         origin over file:// and fails there. The @font-face rules are inline in this
+         document, so the browser starts the fetch as soon as it parses the head. -->
     <!-- Single source of truth: all course data lives in curriculum.js -->
     <script src="curriculum.js"></script>
     <style>
+        @font-face {
+            font-family: 'IBM Plex Sans';
+            font-style: normal;
+            font-weight: 400 600;
+            font-display: block;
+            src: url('fonts/ibm-plex-sans-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'IBM Plex Sans';
+            font-style: normal;
+            font-weight: 400 600;
+            font-display: block;
+            src: url('fonts/ibm-plex-sans-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 500 600;
+            font-display: block;
+            src: url('fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 500 600;
+            font-display: block;
+            src: url('fonts/jetbrains-mono-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Schibsted Grotesk';
+            font-style: normal;
+            font-weight: 500 800;
+            font-display: block;
+            src: url('fonts/schibsted-grotesk-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'Schibsted Grotesk';
+            font-style: normal;
+            font-weight: 500 800;
+            font-display: block;
+            src: url('fonts/schibsted-grotesk-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        /* ─────────────────────────────────────────────────────────
+           TOKENS — mirrors DESIGN.md, identical to index + dag_roadmap
+           ───────────────────────────────────────────────────────── */
         :root {
-            --bg-color: #0d1117;
-            --year-bg: rgba(255,255,255,0.03);
-            --panel-bg: rgba(255,255,255,0.04);
-            --panel-border: rgba(255,255,255,0.07);
-            --text-main: #e2e8f0;
-            --text-dim: #94a3b8;
+            --ink:        #0a0f0d;
+            --ink-2:      #0e1512;
+            --ink-3:      #141c18;
+            --line:       rgba(233,255,242,0.09);
+            --line-2:     rgba(233,255,242,0.16);
+            --text:       #eaf1ec;
+            --text-dim:   #9db0a5;
+            --text-faint: #6a7d73;
+            --accent:     #34e39b;
+            --accent-soft: rgba(52,227,155,0.12);
 
-            /* Exact colors sampled from the image */
-            --c-light-green: #97bc7c;
-            --c-blue: #7297c1;
-            --c-pink: #ce6e98;
-            --c-purple: #8a7db3;
-            --c-teal: #6ba5b7;
-            --c-red: #c25e5a;
-            --c-olive: #a1b255;
-            --c-dark-purple: #5e4a8f;
-            --c-orange: #e28f49;
-            --c-grey: #87766e;
+            /* Course category colours — CONTENT, never chrome. The six shared with the
+               graph carry the same hex there, so a category reads identically on both
+               pages; the four extra grid-only slots follow the same light-on-dark family
+               so every card can take dark ink text. */
+            --c-purple:      #a78bfa;
+            --c-teal:        #2dd4bf;
+            --c-blue:        #60a5fa;
+            --c-pink:        #f472b6;
+            --c-red:         #fb7185;
+            --c-olive:       #bef264;
+            --c-light-green: #86efac;
+            --c-dark-purple: #c084fc;
+            --c-orange:      #fdba74;
+            --c-grey:        #cbd5e1;
+
+            /* Progress states — semantic, shared with the graph */
+            --st-done:     var(--accent);
+            --st-progress: #fbbf24;
+            --st-ready:    #22d3ee;
+
+            --font-display: 'Schibsted Grotesk', system-ui, sans-serif;
+            --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+            --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+            --t-micro: 0.66rem;
+            --t-label: 0.75rem;
+            --t-body:  0.86rem;
+            --t-lead:  1.0rem;
+
+            --r-sm: 6px; --r-md: 9px; --r-lg: 13px;
+            --dur: 180ms;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        ::selection { background: var(--accent-soft); color: var(--text); }
+        * { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+        *::-webkit-scrollbar { width: 8px; height: 8px; }
+        *::-webkit-scrollbar-track { background: transparent; }
+        *::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 4px; }
+        *::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            background-image: linear-gradient(145deg, #0a0a14 0%, #12122a 35%, #0f1b2d 70%, #0a1628 100%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 1vh 1vw;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
+            font-family: var(--font-body);
+            background: var(--ink);
+            color: var(--text);
+            height: 100vh; height: 100dvh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            font-variant-numeric: tabular-nums;
+        }
+        .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+
+        a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: var(--r-sm);
+        }
+
+        .sprite { display: none; }
+        .ic {
+            width: 16px; height: 16px; flex-shrink: 0;
+            fill: none; stroke: currentColor; stroke-width: 1.5;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+        .ic-sm { width: 14px; height: 14px; }
+
+        /* ─────────────────────────────────────────────────────────
+           MASTHEAD — identity, live status, reference, views
+           ───────────────────────────────────────────────────────── */
+        .masthead {
+            flex-shrink: 0;
+            display: flex; align-items: center; gap: 18px;
+            padding: 10px 18px;
+            border-bottom: 1px solid var(--line);
+            background: var(--ink-2);
+        }
+        .brand {
+            display: flex; align-items: center; gap: 9px;
+            font-family: var(--font-display); font-weight: 700;
+            font-size: 0.95rem; letter-spacing: -0.02em;
+            color: var(--text); white-space: nowrap;
+        }
+        .brand .mark {
+            width: 24px; height: 24px; border-radius: var(--r-sm);
+            background: var(--accent-soft); border: 1px solid var(--accent);
+            color: var(--accent); display: grid; place-items: center; flex-shrink: 0;
+        }
+        .brand .mark .ic { width: 13px; height: 13px; }
+
+        .status { display: flex; align-items: center; gap: 10px; margin-left: auto; min-width: 0; }
+        .meter {
+            width: 132px; height: 6px; flex-shrink: 0;
+            background: rgba(233,255,242,0.07);
+            border-radius: 3px; overflow: hidden;
+        }
+        .meter-fill {
+            height: 100%; width: 100%;
+            background: var(--accent); border-radius: 3px;
+            transform: scaleX(0); transform-origin: left center;
+            transition: transform 320ms var(--ease);
+        }
+        .status-text { font-size: var(--t-label); color: var(--text-dim); white-space: nowrap; }
+        .status-text b { color: var(--text); font-family: var(--font-mono); font-weight: 600; }
+
+        .mast-div { width: 1px; height: 20px; background: var(--line); flex-shrink: 0; }
+        .mast-tools { display: flex; align-items: center; gap: 4px; }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            height: 30px; padding: 0 10px;
+            border: 1px solid transparent; border-radius: var(--r-md);
+            background: transparent; color: var(--text-dim);
+            font-family: var(--font-body); font-size: var(--t-label); font-weight: 500;
+            cursor: pointer; white-space: nowrap; text-decoration: none;
+            transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+        }
+        .btn:hover { background: rgba(233,255,242,0.06); color: var(--text); }
+        .btn-icon { width: 30px; padding: 0; justify-content: center; }
+
+        /* ─────────────────────────────────────────────────────────
+           LEGEND — reference, summoned not resident
+           ───────────────────────────────────────────────────────── */
+        .legend-pop {
+            position: fixed; z-index: 90; display: none;
+            width: 320px; max-height: 78vh; overflow-y: auto;
+            padding: 15px 16px 14px;
+            background: var(--ink-3);
+            border: 1px solid var(--line-2);
+            border-radius: var(--r-lg);
+            box-shadow: 0 14px 38px rgba(0,0,0,0.55);
+        }
+        .legend-pop.open { display: block; }
+        .legend-pop h3 {
+            font-size: var(--t-micro); font-weight: 600;
+            letter-spacing: 0.07em; text-transform: uppercase;
+            color: var(--text-dim); margin-bottom: 8px;
+        }
+        .legend-pop h3:not(:first-child) { margin-top: 17px; }
+        .lg-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 3px 0; font-size: var(--t-label); color: var(--text-dim);
+        }
+        .lg-swatch { display: flex; gap: 2px; flex-shrink: 0; }
+        .lg-dot { width: 10px; height: 10px; border-radius: 3px; }
+        .lg-state { width: 12px; height: 12px; border-radius: 3px; border: 2px solid; flex-shrink: 0; }
+        .lg-note {
+            margin-top: 15px; padding-top: 13px;
+            border-top: 1px solid var(--line);
+            font-size: var(--t-label); line-height: 1.55; color: var(--text-dim);
+        }
+
+        /* ─────────────────────────────────────────────────────────
+           STAGE — the whole plan, one screen
+           ───────────────────────────────────────────────────────── */
+        /* gap:0 and symmetric padding on each year, so the divider sits centred in the
+           space rather than hard against the column that owns the border. */
+        .stage {
+            flex: 1; min-height: 0;
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 0; padding: 14px 18px 18px;
+        }
+        .year {
+            display: flex; flex-direction: column; min-height: 0; min-width: 0;
+            padding: 0 16px;
+        }
+        .year:first-child { padding-left: 0; }
+        .year:last-child { padding-right: 0; }
+        /* A hairline between years — the same device the other two surfaces use to
+           separate without boxing anything in. */
+        .year + .year { border-left: 1px solid var(--line); }
+        .year-head {
+            flex-shrink: 0;
+            display: flex; align-items: baseline; gap: 8px;
+            padding-bottom: 7px; margin-bottom: 10px;
+            border-bottom: 1px solid var(--line);
+        }
+        .year-head h2 {
+            font-family: var(--font-display); font-weight: 700;
+            font-size: var(--t-body); letter-spacing: -0.02em; color: var(--text);
+        }
+        .year-head .yr-credits {
+            margin-left: auto;
+            font-family: var(--font-mono); font-size: var(--t-micro); color: var(--text-dim);
+        }
+
+        .terms { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 0; }
+        .term { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+        .term-head {
+            flex-shrink: 0; display: flex; align-items: baseline; gap: 6px;
+            margin-bottom: 7px;
+        }
+        .term-head .tm-label {
+            font-size: var(--t-micro); font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-dim);
+        }
+        .term-head .tm-credits {
+            margin-left: auto; font-family: var(--font-mono);
+            font-size: var(--t-micro); color: var(--text-dim);
+        }
+        .cards { flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+
+        /* Sits under the last year, in the room it leaves empty */
+        .state-key {
+            flex-shrink: 0; margin-top: 18px; padding-top: 14px;
+            border-top: 1px solid var(--line);
+        }
+        .state-key .sk-row {
+            display: flex; align-items: center; gap: 8px;
+            padding: 2px 0; font-size: var(--t-micro); color: var(--text-dim);
+        }
+        .state-key .sk-chip {
+            width: 13px; height: 13px; border-radius: 3px;
+            border: 2px solid; flex-shrink: 0;
+        }
+        html.flow .state-key { margin-top: 22px; }
+
+        /* ── Course card ── */
+        .card {
+            flex: 0 0 var(--card-h, 82px); min-height: 0;
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center; gap: 3px;
+            padding: 7px 9px 9px;
+            border-radius: var(--r-sm);
+            background: var(--card, var(--c-grey));
+            color: #08120c;                      /* dark ink on every category colour */
+            text-decoration: none;
+            transition: transform var(--dur) var(--ease), filter var(--dur) var(--ease);
+        }
+        a.card:hover { transform: translateY(-1px); filter: brightness(1.07); }
+        .card-name {
+            font-size: var(--t-label); font-weight: 600; line-height: 1.28;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2;
             overflow: hidden;
         }
-
-        .page-header {
-            position: relative;
-            flex-shrink: 0;
+        .card-meta {
+            display: flex; align-items: baseline; gap: 6px;
+            font-family: var(--font-mono); font-size: var(--t-micro); font-weight: 600;
+            opacity: 0.72;
+        }
+        .card-meta .cr { margin-left: auto; }
+        .card .go {
+            position: absolute; top: 6px; right: 6px;
+            color: #08120c; opacity: 0.55;
+            transition: opacity var(--dur) var(--ease);
+        }
+        .card .go .ic { width: 11px; height: 11px; stroke-width: 1.8; }
+        a.card:hover .go, a.card:focus-visible .go { opacity: 0.9; }
+        .card .na {
+            position: absolute; top: 5px; right: 6px;
+            font-family: var(--font-body); font-size: var(--t-micro); font-weight: 600;
+            letter-spacing: 0.04em; text-transform: uppercase;
+            color: #08120c; opacity: 0.78;
         }
 
-        h1 {
-            text-align: center;
-            margin: 0 0 10px 0;
-            font-size: 1.4rem;
-            color: var(--text-main);
-            flex-shrink: 0;
+        /* Progress, read from the same store the graph writes.
+           Bar = how far through; outline = the state the legend names. */
+        .card .bar {
+            position: absolute; left: 0; bottom: 0; height: 3px;
+            background: var(--st-progress);
+            border-radius: 0 2px 0 0;
+        }
+        .card.is-done { outline: 2px solid var(--st-done); outline-offset: 1.5px; }
+        .card.is-progress { outline: 2px solid var(--st-progress); outline-offset: 1.5px; }
+        .card.is-done .bar { background: var(--st-done); }
+        .card.is-ready { outline: 1.5px dashed var(--st-ready); outline-offset: 1.5px; }
+        /* focus must beat both */
+        .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        /* ── Tooltip: fixed, so no column can ever clip it ── */
+        .tip {
+            position: fixed; z-index: 120; display: none;
+            max-width: 260px; padding: 7px 10px;
+            background: var(--ink-3);
+            border: 1px solid var(--line-2);
+            border-radius: var(--r-sm);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.5);
+            font-size: var(--t-label); line-height: 1.45; color: var(--text);
+            pointer-events: none;
+        }
+        .tip.open { display: block; }
+        .tip .tip-sub { display: block; margin-top: 3px; color: var(--text-dim); font-size: var(--t-micro); }
+
+        /* ─────────────────────────────────────────────────────────
+           MOBILE — the plan stacks by term and the page scrolls
+           ───────────────────────────────────────────────────────── */
+        /* FLOW: the page gives up fitting one screen and scrolls instead. Set by JS
+           below 1200px, or whenever the fullest term can no longer hold a legible card. */
+        html.flow, html.flow body, html.flow .app { height: auto; min-height: 100dvh; overflow: visible; }
+        html.flow .masthead { position: sticky; top: 0; z-index: 50; }
+        html.flow .card { flex: 0 0 auto; min-height: 58px; }
+        html.flow .stage { grid-template-columns: repeat(2, 1fr); row-gap: 26px; }
+        html.flow .year:nth-child(odd)  { border-left: none; padding-left: 0; }
+        html.flow .year:nth-child(even) { border-left: 1px solid var(--line); }
+        html.flow .year:nth-child(n+3)  { border-top: 1px solid var(--line); padding-top: 20px; }
+
+        @media (max-width: 900px) {
+            body, .app { height: auto; min-height: 100dvh; overflow: visible; }
+            .masthead { position: sticky; top: 0; z-index: 50; padding: 9px 12px; gap: 10px; }
+            .brand .brand-text { display: none; }
+            .stage { padding: 14px 12px 32px; }
+            .cards { gap: 7px; }
+            .card { flex: 0 0 auto; min-height: 54px; padding: 9px 11px 11px; }
+            .card-meta { font-size: var(--t-micro); }
         }
 
-        /* ── View switcher (cross-link to the other page) ── */
-        .view-switch {
-            position: absolute;
-            top: 0;
-            right: 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(96,165,250,0.10);
-            border: 1px solid rgba(96,165,250,0.22);
-            border-radius: 8px;
-            color: #93c5fd;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 0.78rem;
-            font-weight: 600;
-            text-decoration: none;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .view-switch:hover {
-            background: rgba(96,165,250,0.20);
-            border-color: rgba(96,165,250,0.4);
-            color: #dbeafe;
-        }
-
-        .view-switch .vs-icon { font-size: 0.95rem; line-height: 1; }
-        .view-switch.home { right: auto; left: 0; }
-
+        /* Only down here does a year stop fitting two terms side by side. Above it, a
+           tablet keeps two years per row rather than one card stretched to 800px. */
         @media (max-width: 640px) {
-            .view-switch .vs-text { display: none; }
-            .view-switch { padding: 6px 9px; }
+            html.flow .stage { grid-template-columns: 1fr; }
+            html.flow .year:nth-child(even) { border-left: none; }
+            html.flow .year:nth-child(n+2)  { border-top: 1px solid var(--line); padding-top: 24px; }
+            .terms { grid-template-columns: 1fr; gap: 18px; }
+        }
+        @media (max-width: 560px) {
+            .status-text .st-long { display: none; }
+            .meter { width: 84px; }
+            .lg-word { display: none; }
         }
 
-        /* Legend Styling */
-        .legend-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 10px;
-            padding: 8px 15px;
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            flex-shrink: 0;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-
-        .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-        }
-
-        .legend-color-group {
-            display: flex;
-            gap: 2px;
-        }
-
-        /* Roadmap Grid Styling */
-        .roadmap-container {
-            display: flex;
-            gap: 8px;
-            flex: 1;
-            align-items: stretch;
-            min-height: 0;
-        }
-
-        .year-column {
-            background-color: var(--year-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            padding: 8px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .year-title {
-            text-align: center;
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--text-main);
-            margin-top: 0;
-            margin-bottom: 8px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            flex-shrink: 0;
-        }
-
-        .semesters-wrapper {
-            display: flex;
-            gap: 6px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .semester-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .semester-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-dim);
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        /* Course Card Styling */
-        .course-card {
-            border-radius: 4px;
-            padding: 6px 4px;
-            margin-bottom: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-            color: #ffffff;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-            position: relative;
-        }
-
-        /* Tooltip implementation */
-        .course-card::before {
-            content: attr(data-legend);
-            position: absolute;
-            bottom: 105%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .course-card:hover::before {
-            opacity: 1;
-        }
-
-        a.course-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-
-        .course-name {
-            font-weight: bold;
-            font-size: clamp(0.7rem, 1.1vh, 0.75rem);
-            line-height: 1.5;
-            text-align: center;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-transform: uppercase;
-        }
-
-        .course-details {
-            background-color: rgba(255, 255, 255, 0.95);
-            color: #333;
-            width: 95%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-size: clamp(0.75rem, 1vh, 0.7rem);
-        }
-
-        .course-code {
-            font-family: monospace;
-            font-weight: 600;
-        }
-
-        .course-credits {
-            font-weight: bold;
-        }
-
-        /* "no CU Get Reg page" state */
-        .course-card.no-getreg { cursor: default; }
-        .na-badge {
-            position: absolute;
-            top: 3px;
-            right: 4px;
-            font-size: 0.5rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            color: #fff;
-            background: rgba(0,0,0,0.30);
-            border-radius: 3px;
-            padding: 1px 4px;
-            line-height: 1.3;
-            pointer-events: none;
-        }
-
-        /* Category Color Classes */
-        .bg-light-green { background-color: var(--c-light-green); }
-        .bg-blue { background-color: var(--c-blue); }
-        .bg-pink { background-color: var(--c-pink); }
-        .bg-purple { background-color: var(--c-purple); }
-        .bg-teal { background-color: var(--c-teal); }
-        .bg-red { background-color: var(--c-red); }
-        .bg-olive { background-color: var(--c-olive); }
-        .bg-dark-purple { background-color: var(--c-dark-purple); }
-        .bg-orange { background-color: var(--c-orange); }
-        .bg-grey { background-color: var(--c-grey); }
     </style>
 </head>
 <body>
+<!--
+  THESIS: The four-year plan as one readable field, with the reader's own progress laid
+    over it. Refuses the boxed-panel dashboard the old page was: no card chrome around
+    the columns, no resident legend bar — hairlines separate, the grid takes the screen.
+  OWN-WORLD: DESIGN.md as shipped on index.html and dag_roadmap.html — green-biased ink
+    ground, hairline rules instead of card borders, one accent (#34e39b) for progress and
+    selection, the ten category colours confined to the course cards themselves,
+    Schibsted Grotesk on the wordmark and year headings, IBM Plex Sans across the UI,
+    JetBrains Mono for course codes and credits, authored 1.5px geometric SVG icons.
+  STORY: A CP student scans the whole degree term by term, sees which courses they have
+    finished and which they are ready for, and opens any course on CU Get Reg.
+  FIRST VIEWPORT: Masthead (wordmark left, live progress meter, legend, view links);
+    then all four years side by side, each split into its two terms, the whole plan
+    visible at once without scrolling.
+  FORM: Extension inside an established world (new-work.md §3) — no roll, no seed key;
+    composition confirmed with the user before building.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the finish
+    review, the verdict, DESIGN.md, and every shipping raster carrying its provenance.
+-->
 
-    <div class="page-header">
-        <h1 id="page-title"></h1>
-        <a class="view-switch home" href="index.html" title="Back to home">
-            <span class="vs-icon">⌂</span><span class="vs-text">Home</span>
-        </a>
-        <a class="view-switch" href="dag_roadmap.html" title="Switch to the prerequisite graph view">
-            <span class="vs-icon">⋔</span><span class="vs-text">Prerequisite Map</span>
-        </a>
+<svg class="sprite" aria-hidden="true" focusable="false"><defs>
+    <symbol id="i-mark" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 5.6c0 1.7-2.5 1.3-2.5 3.2"/><path d="M8 5.6c0 1.7 2.5 1.3 2.5 3.2"/></g><g fill="currentColor"><circle cx="8" cy="4" r="1.6"/><circle cx="5.5" cy="11.5" r="1.6"/><circle cx="10.5" cy="11.5" r="1.6"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 16 16"><path d="M2.6 6.9 8 2.6l5.4 4.3v6a.6.6 0 0 1-.6.6H3.2a.6.6 0 0 1-.6-.6z"/></symbol>
+    <symbol id="i-map" viewBox="0 0 16 16"><circle cx="8" cy="3.4" r="1.6"/><circle cx="3.6" cy="12.6" r="1.6"/><circle cx="12.4" cy="12.6" r="1.6"/><path d="M7.2 4.9 4.4 11.1M8.8 4.9l2.8 6.2"/></symbol>
+    <symbol id="i-legend" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.7"/><path d="M8 7.4v3.3M8 5.2v.01"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 16 16"><path d="M4.8 6.4 8 9.6l3.2-3.2"/></symbol>
+    <symbol id="i-external" viewBox="0 0 16 16"><path d="M9.4 2.8h3.8v3.8M13.2 2.8 7.6 8.4"/><path d="M11.6 9.6v3a.8.8 0 0 1-.8.8H3.6a.8.8 0 0 1-.8-.8V5.4a.8.8 0 0 1 .8-.8h3"/></symbol>
+</defs></svg>
+
+<div class="app">
+
+    <header class="masthead">
+        <div class="brand">
+            <span class="mark"><svg class="ic"><use href="#i-mark"/></svg></span>
+            <span class="brand-text">Computer Engineering Roadmap</span>
+        </div>
+
+        <div class="status">
+            <div class="meter" role="img" aria-label="Overall curriculum progress" id="ps-meter">
+                <div class="meter-fill" id="ps-fill"></div>
+            </div>
+            <div class="status-text" id="ps-text"></div>
+        </div>
+
+        <div class="mast-div" aria-hidden="true"></div>
+
+        <button class="btn" type="button" id="legend-toggle" aria-expanded="false" aria-controls="legend-pop">
+            <svg class="ic"><use href="#i-legend"/></svg><span class="lg-word">Legend</span><svg class="ic ic-sm"><use href="#i-chevron"/></svg>
+        </button>
+
+        <div class="mast-div" aria-hidden="true"></div>
+
+        <nav class="mast-tools" aria-label="Views">
+            <a class="btn btn-icon" href="index.html" title="Home" aria-label="Home"><svg class="ic"><use href="#i-home"/></svg></a>
+            <a class="btn btn-icon" href="dag_roadmap.html" title="Prerequisite map" aria-label="Prerequisite map"><svg class="ic"><use href="#i-map"/></svg></a>
+        </nav>
+    </header>
+
+    <div class="legend-pop" id="legend-pop" role="dialog" aria-label="Grid legend">
+        <h3>Requirement categories</h3>
+        <div id="legend-rows"></div>
+
+        <h3>Your progress</h3>
+        <div class="lg-row"><span class="lg-state" style="border-color:var(--st-done)"></span>Done — every topic ticked</div>
+        <div class="lg-row"><span class="lg-state" style="border-color:var(--st-progress)"></span>In progress — the bar shows how far</div>
+        <div class="lg-row"><span class="lg-state" style="border-color:var(--st-ready);border-style:dashed"></span>Ready — prerequisites complete</div>
+
+        <div class="lg-note" id="progress-note"></div>
+        <div class="lg-note" id="subtitle"></div>
     </div>
-    <div id="legend" class="legend-container"></div>
-    <div id="roadmap" class="roadmap-container"></div>
 
-    <script>
-        // ─────────────────────────────────────────────────────────────
-        //  All data comes from curriculum.js (window.CURRICULUM)
-        // ─────────────────────────────────────────────────────────────
-        const DATA = window.CURRICULUM;
-        const noGetReg = new Set(DATA.getRegUnavailable || []);
+    <main class="stage" id="roadmap"></main>
+</div>
 
-        // Page title from data
-        document.getElementById('page-title').innerText =
-            `Bachelor of Engineering: Computer Engineering (${DATA.meta.curriculumYear})`;
+<div class="tip" id="tip" role="tooltip"></div>
 
-        // ─── Build the legend from DATA.gridLegend + DATA.buckets ───
-        const legendContainer = document.getElementById('legend');
-        DATA.gridLegend.forEach(item => {
-            const legendDiv = document.createElement('div');
-            legendDiv.className = 'legend-item';
+<script>
+    // ═══════════════════════════════════════════════════════
+    //  DATA — all sourced from curriculum.js (window.CURRICULUM)
+    // ═══════════════════════════════════════════════════════
+    const DATA = window.CURRICULUM;
+    const noGetReg = new Set(DATA.getRegUnavailable || []);
 
-            if (item.colors.length > 1) {
-                const group = document.createElement('div');
-                group.className = 'legend-color-group';
-                item.colors.forEach(color => {
-                    const colorBox = document.createElement('div');
-                    colorBox.className = `legend-color bg-${color}`;
-                    group.appendChild(colorBox);
-                });
-                legendDiv.appendChild(group);
-            } else {
-                const colorBox = document.createElement('div');
-                colorBox.className = `legend-color bg-${item.colors[0]}`;
-                legendDiv.appendChild(colorBox);
-            }
+    const courseByKey = {};
+    DATA.courses.forEach(c => {
+        c.topics = DATA.courseTopics[c.key] || [];
+        courseByKey[c.key] = c;
+    });
 
-            const label = document.createElement('span');
-            label.innerText = DATA.buckets[item.bucket].label;
+    // ═══════════════════════════════════════════════════════
+    //  PROGRESS  — read-only here; the graph view is where topics get ticked.
+    //  Same localStorage key and shape, so the two pages always agree.
+    // ═══════════════════════════════════════════════════════
+    const LS_KEY = 'cpRoadmap.progress.v1';
+    let progress = {};
+    try { progress = JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e) { progress = {}; }
 
-            legendDiv.appendChild(label);
-            legendContainer.appendChild(legendDiv);
-        });
+    const isLearned = (key, tp) => !!(progress[key] && progress[key][tp]);
+    function courseFraction(key) {
+        const t = (courseByKey[key] || {}).topics || [];
+        if (!t.length) return 0;
+        return t.filter(tp => isLearned(key, tp)).length / t.length;
+    }
+    const courseDone = key => {
+        const t = (courseByKey[key] || {}).topics || [];
+        return t.length > 0 && t.every(tp => isLearned(key, tp));
+    };
+    // No hard prerequisite is itself a satisfied state, exactly as in the graph.
+    const prereqsSatisfied = key => DATA.edges
+        .filter(e => e.to === key && e.type === 'prereq')
+        .every(e => courseDone(e.from));
+    function computeState(key) {
+        const c = courseByKey[key];
+        if (!c || !c.topics.length) return 'none';   // electives / gen-ed carry no topics
+        const f = courseFraction(key);
+        if (f >= 1) return 'done';
+        if (f > 0) return 'progress';
+        return prereqsSatisfied(key) ? 'ready' : 'idle';
+    }
 
-        // ─── Group courses by year, then semester (preserving order) ───
-        const years = {};
-        DATA.courses.forEach(c => {
-            years[c.year] = years[c.year] || {};
-            (years[c.year][c.sem] = years[c.year][c.sem] || []).push(c);
-        });
+    // ═══════════════════════════════════════════════════════
+    //  BUILD THE GRID
+    // ═══════════════════════════════════════════════════════
+    const years = {};
+    DATA.courses.forEach(c => {
+        years[c.year] = years[c.year] || {};
+        (years[c.year][c.sem] = years[c.year][c.sem] || []).push(c);
+    });
 
-        function creditLabel(year, sem, courses) {
-            const override = DATA.semesterLabels[`${year}-${sem}`];
-            if (override) return override;
-            return courses.reduce((sum, c) => sum + c.credits, 0);
-        }
+    function creditLabel(year, sem, courses) {
+        const override = DATA.semesterLabels[`${year}-${sem}`];
+        if (override) return override;
+        return courses.reduce((sum, c) => sum + c.credits, 0);
+    }
 
-        // ─── Build the roadmap grid ───
-        const container = document.getElementById('roadmap');
-        Object.keys(years).map(Number).sort((a, b) => a - b).forEach(year => {
-            const yearCol = document.createElement('div');
-            yearCol.className = 'year-column';
+    const stage = document.getElementById('roadmap');
 
-            const yearTitle = document.createElement('h2');
-            yearTitle.className = 'year-title';
-            yearTitle.innerText = `Year ${year}`;
-            yearCol.appendChild(yearTitle);
+    Object.keys(years).map(Number).sort((a, b) => a - b).forEach(year => {
+        const terms = years[year];
+        const yearCredits = Object.keys(terms).reduce(
+            (sum, sem) => sum + terms[sem].reduce((s, c) => s + c.credits, 0), 0);
 
-            const semestersWrapper = document.createElement('div');
-            semestersWrapper.className = 'semesters-wrapper';
+        const yearEl = document.createElement('section');
+        yearEl.className = 'year';
+        yearEl.innerHTML =
+            `<div class="year-head"><h2>Year ${year}</h2>` +
+            `<span class="yr-credits">${yearCredits} cr</span></div>` +
+            `<div class="terms"></div>`;
+        const termsEl = yearEl.querySelector('.terms');
 
-            Object.keys(years[year]).map(Number).sort((a, b) => a - b).forEach(sem => {
-                const courses = years[year][sem];
+        Object.keys(terms).map(Number).sort((a, b) => a - b).forEach(sem => {
+            const courses = terms[sem];
+            const termEl = document.createElement('div');
+            termEl.className = 'term';
+            termEl.innerHTML =
+                `<div class="term-head"><span class="tm-label">Sem ${sem}</span>` +
+                `<span class="tm-credits">${creditLabel(year, sem, courses)} cr</span></div>` +
+                `<div class="cards"></div>`;
+            const cardsEl = termEl.querySelector('.cards');
 
-                const semCol = document.createElement('div');
-                semCol.className = 'semester-column';
+            courses.forEach(course => {
+                const isCodeValid = /^\d+$/.test(course.code);
+                const linkable = isCodeValid && !noGetReg.has(course.key);
+                const card = document.createElement(linkable ? 'a' : 'div');
 
-                const semTitle = document.createElement('div');
-                semTitle.className = 'semester-title';
-                semTitle.innerText = `${year}/${sem} (${creditLabel(year, sem, courses)} Credits)`;
-                semCol.appendChild(semTitle);
+                card.className = 'card';
+                card.style.setProperty('--card', `var(--c-${course.color})`);
+                if (linkable) {
+                    card.href = `${DATA.meta.getRegBase}${course.code}`;
+                    card.target = '_blank';
+                    card.rel = 'noopener noreferrer';
+                } else {
+                    card.tabIndex = 0;               // still reachable, so the tip is too
+                }
 
-                courses.forEach(course => {
-                    const isCodeValid = /^\d+$/.test(course.code);
-                    const linkable = isCodeValid && !noGetReg.has(course.key);
+                const state = computeState(course.key);
+                const frac = courseFraction(course.key);
+                if (state === 'done') card.classList.add('is-done');
+                if (state === 'progress') card.classList.add('is-progress');
+                if (state === 'ready') card.classList.add('is-ready');
 
-                    const card = document.createElement(linkable ? 'a' : 'div');
-                    card.className = `course-card bg-${course.color}`;
-                    let tip = DATA.buckets[course.bucket].label;
-                    if (isCodeValid && !linkable) tip += ' · CU Get Reg not available';
-                    card.setAttribute('data-legend', tip);
+                card.innerHTML =
+                    `<div class="card-name">${course.name}</div>` +
+                    `<div class="card-meta"><span>${course.code}</span>` +
+                    `<span class="cr">${course.credits}</span></div>` +
+                    (frac > 0 ? `<span class="bar" style="width:${(frac * 100).toFixed(1)}%"></span>` : '') +
+                    (linkable ? `<span class="go"><svg class="ic"><use href="#i-external"/></svg></span>` : '') +
+                    (isCodeValid && !linkable ? `<span class="na">n/a</span>` : '');
 
-                    if (linkable) {
-                        card.href = `${DATA.meta.getRegBase}${course.code}`;
-                        card.target = "_blank";
-                        card.rel = "noopener noreferrer";
-                    }
+                // What the tooltip says: the requirement this course satisfies, plus
+                // whatever the reader's own progress adds to it.
+                const bits = [DATA.buckets[course.bucket].label];
+                if (state === 'done') bits.push('Done');
+                else if (state === 'progress') bits.push(`${Math.round(frac * 100)}% through`);
+                else if (state === 'ready') bits.push('Ready to take');
+                if (isCodeValid && !linkable) bits.push('No CU Get Reg page');
+                card.dataset.tip = course.name;
+                card.dataset.tipSub = bits.join(' · ');
+                card.setAttribute('aria-label', `${course.name}, ${course.code}, ${course.credits} credits. ${bits.join('. ')}`);
 
-                    // Small indicator for courses with a real code but no CU Get Reg page
-                    if (isCodeValid && !linkable) {
-                        card.classList.add('no-getreg');
-                        const flag = document.createElement('span');
-                        flag.className = 'na-badge';
-                        flag.textContent = 'n/a';
-                        flag.title = 'CU Get Reg page not available';
-                        card.appendChild(flag);
-                    }
-
-                    const name = document.createElement('div');
-                    name.className = 'course-name';
-                    name.innerText = course.abbr;
-
-                    const details = document.createElement('div');
-                    details.className = 'course-details';
-
-                    const code = document.createElement('span');
-                    code.className = 'course-code';
-                    code.innerText = course.code;
-
-                    const credits = document.createElement('span');
-                    credits.className = 'course-credits';
-                    credits.innerText = `(${course.credits})`;
-
-                    details.appendChild(code);
-                    details.appendChild(credits);
-
-                    card.appendChild(name);
-                    card.appendChild(details);
-                    semCol.appendChild(card);
-                });
-
-                semestersWrapper.appendChild(semCol);
+                cardsEl.appendChild(card);
             });
 
-            yearCol.appendChild(semestersWrapper);
-            container.appendChild(yearCol);
+            termsEl.appendChild(termEl);
         });
-    </script>
+
+        stage.appendChild(yearEl);
+    });
+
+    // The outlines are already on screen at 0% progress, so the key that explains them
+    // belongs on screen too — placed in the room the last year leaves empty.
+    const lastYear = stage.lastElementChild;
+    if (lastYear) {
+        const key = document.createElement('div');
+        key.className = 'state-key';
+        key.innerHTML = [
+            ['--st-done', 'Done'],
+            ['--st-progress', 'In progress'],
+            ['--st-ready', 'Ready to take'],
+        ].map(([v, label]) =>
+            `<div class="sk-row"><span class="sk-chip" style="border-color:var(${v})${v === '--st-ready' ? ';border-style:dashed' : ''}"></span>${label}</div>`
+        ).join('');
+        lastYear.appendChild(key);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  CARD HEIGHT
+    //  Every card on the page shares one height: the height that makes the fullest
+    //  term fill its column exactly. Letting each term stretch its own cards instead
+    //  would size a five-course term differently from an eight-course one sitting
+    //  right beside it, and the grid would stop reading as one field.
+    // ═══════════════════════════════════════════════════════
+    const GAP = 8;
+    const MIN_CARD = 58;   // below this a card cannot hold two lines plus its meta row
+    function sizeCards() {
+        const root = document.documentElement;
+        const flow = () => { root.classList.add('flow'); root.style.removeProperty('--card-h'); };
+
+        // Under 1200px the eight term columns are too narrow to read; flow instead.
+        if (window.matchMedia('(max-width: 1200px)').matches) return flow();
+
+        root.classList.remove('flow');
+        const lists = [...document.querySelectorAll('.cards')];
+        if (!lists.length) return;
+        // .cards is flex:1 inside a fixed-height column, so its height is set by the
+        // layout, not by the cards in it — safe to measure before sizing them.
+        const avail = lists[0].getBoundingClientRect().height;
+        const most = Math.max(...lists.map(el => el.children.length));
+        if (!avail || !most) return;
+        const h = Math.floor((avail - (most - 1) * GAP) / most);
+        // Clamping here used to hide the overflow: the last cards of the fullest terms
+        // were cut off by body{overflow:hidden} with no way to reach them.
+        if (h < MIN_CARD) return flow();
+        root.style.setProperty('--card-h', h + 'px');
+    }
+    sizeCards();
+    window.addEventListener('resize', sizeCards);
+
+    // ═══════════════════════════════════════════════════════
+    //  TOOLTIP  (fixed position, so no column can clip it)
+    // ═══════════════════════════════════════════════════════
+    const tip = document.getElementById('tip');
+    function showTip(el) {
+        tip.innerHTML = `${el.dataset.tip}<span class="tip-sub">${el.dataset.tipSub}</span>`;
+        tip.classList.add('open');
+        const r = el.getBoundingClientRect();
+        const t = tip.getBoundingClientRect();
+        let left = r.left + r.width / 2 - t.width / 2;
+        left = Math.max(10, Math.min(left, window.innerWidth - t.width - 10));
+        // Flip under when it would ride up over the year and term headings, not just
+        // when it would leave the viewport — those labels are how the grid is read.
+        const bound = stage.getBoundingClientRect().top;
+        let top = r.top - t.height - 8;
+        if (top < bound + 2) top = r.bottom + 8;
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+    }
+    const hideTip = () => tip.classList.remove('open');
+    stage.addEventListener('mouseover', e => { const c = e.target.closest('.card'); if (c) showTip(c); });
+    stage.addEventListener('mouseout', e => { if (e.target.closest('.card')) hideTip(); });
+    stage.addEventListener('focusin', e => { const c = e.target.closest('.card'); if (c) showTip(c); });
+    stage.addEventListener('focusout', hideTip);
+    window.addEventListener('scroll', hideTip, { passive: true });
+
+    // ═══════════════════════════════════════════════════════
+    //  LEGEND POPOVER
+    // ═══════════════════════════════════════════════════════
+    const legendRows = document.getElementById('legend-rows');
+    DATA.gridLegend.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'lg-row';
+        row.innerHTML =
+            `<span class="lg-swatch">` +
+            item.colors.map(c => `<span class="lg-dot" style="background:var(--c-${c})"></span>`).join('') +
+            `</span><span>${DATA.buckets[item.bucket].label}</span>`;
+        legendRows.appendChild(row);
+    });
+
+    const legendPop = document.getElementById('legend-pop');
+    const legendBtn = document.getElementById('legend-toggle');
+    function placeLegend() {
+        const r = legendBtn.getBoundingClientRect();
+        legendPop.style.visibility = 'hidden';
+        legendPop.classList.add('open');
+        const w = legendPop.offsetWidth, h = legendPop.offsetHeight;
+        legendPop.style.left = Math.max(12, Math.min(r.right - w, window.innerWidth - w - 12)) + 'px';
+        legendPop.style.top = Math.min(r.bottom + 8, window.innerHeight - h - 12) + 'px';
+        legendPop.style.visibility = '';
+    }
+    function openLegend() { placeLegend(); legendBtn.setAttribute('aria-expanded', 'true'); }
+    function closeLegend() { legendPop.classList.remove('open'); legendBtn.setAttribute('aria-expanded', 'false'); }
+    legendBtn.addEventListener('click', ev => {
+        ev.stopPropagation();
+        legendPop.classList.contains('open') ? closeLegend() : openLegend();
+    });
+    document.addEventListener('click', ev => {
+        if (!legendPop.classList.contains('open')) return;
+        if (!legendPop.contains(ev.target) && ev.target !== legendBtn) closeLegend();
+    });
+    document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { closeLegend(); hideTip(); } });
+    window.addEventListener('resize', () => { if (legendPop.classList.contains('open')) placeLegend(); });
+
+    // ═══════════════════════════════════════════════════════
+    //  STATUS  — the same numbers the graph reports
+    // ═══════════════════════════════════════════════════════
+    (function refreshStatus() {
+        const graphed = DATA.courses.filter(c => c.dag);
+        let learned = 0, total = 0, done = 0;
+        graphed.forEach(c => {
+            total += c.topics.length;
+            learned += c.topics.filter(tp => isLearned(c.key, tp)).length;
+            if (courseDone(c.key)) done++;
+        });
+        const pct = total ? Math.round(learned / total * 100) : 0;
+        // Two frames: the element must paint at scaleX(0) before the value is set, or
+        // the transition has nothing to animate from.
+        const fillTo = total ? learned / total : 0;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.getElementById('ps-fill').style.transform = `scaleX(${fillTo})`;
+        }));
+        document.getElementById('ps-meter').setAttribute('aria-label', `Overall progress ${pct} percent`);
+        document.getElementById('ps-text').innerHTML =
+            `<b>${pct}%</b> overall<span class="st-long"> · <b>${done}</b>/${graphed.length} courses done</span>`;
+
+        const noTopics = DATA.courses.length - graphed.length;
+        document.getElementById('progress-note').innerHTML =
+            `<b>Progress</b> is ticked off in the <a href="dag_roadmap.html" style="color:var(--accent)">prerequisite map</a> ` +
+            `and shown here. ${noTopics} elective and general-education slots carry no topic list, so they show no state.`;
+        document.getElementById('subtitle').textContent =
+            `${DATA.meta.university} · ${DATA.meta.program} · Curriculum ${DATA.meta.curriculumYear}`;
+    })();
+</script>
 </body>
 </html>

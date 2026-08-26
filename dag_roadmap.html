@@ -6,9 +6,12 @@
     <title>Prerequisite Map · Computer Engineering · CU</title>
     <meta name="description" content="Every course in the CU Computer Engineering curriculum and what it depends on — with a per-topic learning checklist you can tick as you go.">
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="%230a0f0d"/><g fill="none" stroke="%2334e39b" stroke-width="2.6" stroke-linecap="round"><path d="M16 11.2c0 3.4-5 2.6-5 6.4"/><path d="M16 11.2c0 3.4 5 2.6 5 6.4"/></g><g fill="%2334e39b"><circle cx="16" cy="8" r="3.2"/><circle cx="11" cy="23" r="3.2"/><circle cx="21" cy="23" r="3.2"/></g></svg>'>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <!-- Fonts are self-hosted in /fonts so the pages never depend on a CDN and
+         never flash a fallback face before the real one arrives (same reason the
+         graph libraries live in /lib). Variable woff2, latin + latin-ext.
+         No <link rel=preload>: a font preload must be CORS-mode, which has no valid
+         origin over file:// and fails there. The @font-face rules are inline in this
+         document, so the browser starts the fetch as soon as it parses the head. -->
     <!-- Graph libraries are vendored locally (see /lib) so the page never
          depends on a CDN. Versions: cytoscape 3.28.1, dagre 0.8.5, cytoscape-dagre 2.5.0 -->
     <script src="lib/cytoscape.min.js"></script>
@@ -17,6 +20,55 @@
     <!-- Single source of truth: all course data lives in curriculum.js -->
     <script src="curriculum.js"></script>
     <style>
+        @font-face {
+            font-family: 'IBM Plex Sans';
+            font-style: normal;
+            font-weight: 400 600;
+            font-display: block;
+            src: url('fonts/ibm-plex-sans-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'IBM Plex Sans';
+            font-style: normal;
+            font-weight: 400 600;
+            font-display: block;
+            src: url('fonts/ibm-plex-sans-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 500 600;
+            font-display: block;
+            src: url('fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-style: normal;
+            font-weight: 500 600;
+            font-display: block;
+            src: url('fonts/jetbrains-mono-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Schibsted Grotesk';
+            font-style: normal;
+            font-weight: 500 800;
+            font-display: block;
+            src: url('fonts/schibsted-grotesk-latin-ext.woff2') format('woff2');
+            unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+            font-family: 'Schibsted Grotesk';
+            font-style: normal;
+            font-weight: 500 800;
+            font-display: block;
+            src: url('fonts/schibsted-grotesk-latin.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         /* ─────────────────────────────────────────────────────────
            TOKENS — mirrors DESIGN.md, identical to index.html
            ───────────────────────────────────────────────────────── */
@@ -392,16 +444,32 @@
             min-width: 0;
             overflow: hidden;
         }
-        /* The map is wider than any viewport, so its left and right edges fade instead
-           of ending in a hard cut — a half-drawn course reads as a rendering fault,
-           a fading one reads as "the map continues". Buttons and states sit outside
-           this layer so they never fade. */
+        /* Held at the full stage width and CLIPPED by .canvas-wrap, never resized to it.
+           The docking panel then reveals or covers already-painted pixels instead of
+           forcing cytoscape to reallocate and repaint its canvases mid-animation, which
+           is what left the graph blank for a few frames. */
         .graph-layer {
             position: absolute;
-            inset: 0;
-            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+            top: 0; left: 0;
+            height: 100%;
+            width: 100vw;
         }
+
+        /* The map is wider than any viewport, so its left and right edges fade instead
+           of ending in a hard cut — a half-drawn course reads as a rendering fault, a
+           fading one reads as "the map continues". These sit above the graph but below
+           the buttons and states, so those never fade. */
+        .canvas-wrap::before,
+        .canvas-wrap::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 30px;
+            z-index: 4;
+            pointer-events: none;
+        }
+        .canvas-wrap::before { left: 0; background: linear-gradient(to right, var(--ink), transparent); }
+        .canvas-wrap::after { right: 0; background: linear-gradient(to left, var(--ink), transparent); }
         #cy { width: 100%; height: 100%; position: relative; z-index: 2; }
         /* Rings sit BELOW cytoscape so edges and arrows paint on top */
         #cy-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
@@ -855,7 +923,7 @@
 -->
 
 <svg class="sprite" aria-hidden="true" focusable="false"><defs>
-    <symbol id="i-mark" viewBox="0 0 16 16"><rect x="4.2" y="4.2" width="7.6" height="7.6" rx="2.2"/><path d="M8 1.5a6.5 6.5 0 0 1 6.5 6.5"/></symbol>
+    <symbol id="i-mark" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 5.6c0 1.7-2.5 1.3-2.5 3.2"/><path d="M8 5.6c0 1.7 2.5 1.3 2.5 3.2"/></g><g fill="currentColor"><circle cx="8" cy="4" r="1.6"/><circle cx="5.5" cy="11.5" r="1.6"/><circle cx="10.5" cy="11.5" r="1.6"/></g></symbol>
     <symbol id="i-home" viewBox="0 0 16 16"><path d="M2.6 6.9 8 2.6l5.4 4.3v6a.6.6 0 0 1-.6.6H3.2a.6.6 0 0 1-.6-.6z"/></symbol>
     <symbol id="i-grid" viewBox="0 0 16 16"><rect x="2.6" y="2.6" width="4.6" height="4.6" rx="1"/><rect x="8.8" y="2.6" width="4.6" height="4.6" rx="1"/><rect x="2.6" y="8.8" width="4.6" height="4.6" rx="1"/><rect x="8.8" y="8.8" width="4.6" height="4.6" rx="1"/></symbol>
     <symbol id="i-export" viewBox="0 0 16 16"><path d="M8 2.4v7.2M5.2 6.9 8 9.7l2.8-2.8M2.8 12.9h10.4"/></symbol>
@@ -1323,6 +1391,22 @@
         });
     }
     window.addEventListener('resize', () => { sizeOverlay(); scheduleDraw(); });
+
+    // Watch the STAGE, not the canvas: the stage only changes with the window, so
+    // cytoscape re-measures on a real resize and never during the panel's animation.
+    // Resizing it per frame clears its canvases faster than it repaints them, which
+    // blanks the whole graph.
+    if (window.ResizeObserver) {
+        let last = 0;
+        new ResizeObserver(entries => {
+            const w = Math.round(entries[0].contentRect.width);
+            if (!cy || w === last) return;
+            last = w;
+            cy.resize();
+            sizeOverlay();
+            drawRings();
+        }).observe(document.querySelector('.stage'));
+    }
 
     // ═══════════════════════════════════════════════════════
     //  RENDER GRAPH
