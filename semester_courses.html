@@ -379,8 +379,17 @@
 
         @media (max-width: 900px) {
             body, .app { height: auto; min-height: 100dvh; overflow: visible; }
-            .masthead { position: sticky; top: 0; z-index: 50; padding: 9px 12px; gap: 10px; }
+            /* Same rule as the graph page: nothing in the masthead shrinks below its
+               content, the decorative hairlines go, and the progress readout takes its
+               own full-width row instead of being squeezed to a stub. */
+            .masthead { position: sticky; top: 0; z-index: 50; padding: 9px 12px; gap: 10px;
+                        flex-wrap: wrap; row-gap: 9px; }
+            .masthead > * { flex-shrink: 0; }
+            .mast-div { display: none; }
             .brand .brand-text { display: none; }
+            .status { order: 1; width: 100%; margin-left: 0; }
+            .status-text .st-long { display: none; }
+            .meter { flex: 1 1 auto; width: auto; }
             .stage { padding: 14px 12px 32px; }
             .cards { gap: 7px; }
             .card { flex: 0 0 auto; min-height: 54px; padding: 9px 11px 11px; }
@@ -396,8 +405,6 @@
             .terms { grid-template-columns: 1fr; gap: 18px; }
         }
         @media (max-width: 560px) {
-            .status-text .st-long { display: none; }
-            .meter { width: 84px; }
             .lg-word { display: none; }
         }
 

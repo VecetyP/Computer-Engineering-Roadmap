@@ -811,10 +811,17 @@
            MOBILE — structural change, not fluid type
            ───────────────────────────────────────────────────────── */
         @media (max-width: 860px) {
-            .masthead { padding: 9px 12px; gap: 10px; }
+            /* One rigid row cannot hold brand + meter + six controls on a phone: the
+               meter was squeezed to nothing and the buttons then overlapped. Nothing
+               shrinks any more, the decorative hairlines go, and the progress readout
+               takes its own row where it is finally wide enough to read. */
+            .masthead { padding: 9px 12px; gap: 10px; flex-wrap: wrap; row-gap: 9px; }
+            .masthead > * { flex-shrink: 0; }
+            .mast-div { display: none; }
             .brand span.brand-text { display: none; }
             .status-text .st-long { display: none; }
-            .meter { width: 84px; }
+            .status { order: 1; width: 100%; margin-left: 0; }
+            .meter { flex: 1 1 auto; width: auto; }
             .controls { padding: 8px 12px; gap: 10px; }
 
             /* One swipeable line each, never a tall wrap */
@@ -878,7 +885,6 @@
         }
 
         @media (max-width: 560px) {
-            .status-text { display: none; }
             .lg-word { display: none; }
         }
 
